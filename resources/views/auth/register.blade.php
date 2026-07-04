@@ -62,11 +62,11 @@
                 @enderror
             </div>
 
-            <!-- Department -->
+            <!-- Course (Department) -->
             <div class="col-md-6">
-                <label for="department_id" class="form-label">Department</label>
+                <label for="department_id" class="form-label">Course</label>
                 <select class="form-select @error('department_id') is-invalid @enderror" id="department_id" name="department_id" required>
-                    <option value="" disabled selected>Select Department...</option>
+                    <option value="" disabled selected>Select Course...</option>
                     @foreach($departments as $department)
                         <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
                     @endforeach

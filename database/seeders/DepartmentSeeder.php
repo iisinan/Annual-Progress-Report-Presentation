@@ -12,6 +12,7 @@ class DepartmentSeeder extends Seeder
         $departments = [
             'Cybersecurity',
             'Artificial Intelligence',
+            'Management Information System',
             'Data Science',
             'Software Engineering',
             'Information Technology',
