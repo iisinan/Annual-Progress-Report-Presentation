@@ -1,0 +1,3 @@
+[build.env]
+RAILPACK_PHP_VERSION = "8.4"
+RAILPACK_PHP_EXTENSIONS = "gd"
