@@ -182,8 +182,13 @@
 
             <!-- Examiner Comments Timeline -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 fw-bold text-info"><i class="fa-solid fa-comments me-2"></i> Examiner Comments</h6>
+                    @if(auth()->user()->hasRole('Examiner'))
+                        <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#commentModal">
+                            <i class="fa-solid fa-comment-dots"></i> Leave Comment
+                        </button>
+                    @endif
                 </div>
                 <div class="card-body">
                     @if($student->comments && $student->comments->count() > 0)
@@ -205,6 +210,33 @@
             </div>
         </div>
     </div>
+
+    @if(auth()->user()->hasRole('Examiner'))
+    <!-- Comment Modal -->
+    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('examiner.comments.store', $student->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="commentModalLabel"><i class="fa-solid fa-comment-dots me-2"></i> Add Comment</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Comment (Visible to Student and Admin)</label>
+                            <textarea class="form-control" name="body" rows="4" required placeholder="Type your observations, questions, or feedback here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info text-white">Save Comment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- PPT Action Modal -->
     @if($student->presentation && $student->presentation->file_path)
