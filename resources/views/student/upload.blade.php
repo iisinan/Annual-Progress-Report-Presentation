@@ -123,6 +123,12 @@
                             // It returns a redirect normally, or success response
                             window.location.reload();
                         } else {
+                            if (xhr.status === 401 || xhr.status === 419) {
+                                alert('Your session has expired. You will be redirected to the login page.');
+                                window.location.href = '/login';
+                                return;
+                            }
+                            
                             alert('An error occurred during the upload. Please try again.');
                             uploadBtn.disabled = false;
                             uploadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload PDF Presentation';
