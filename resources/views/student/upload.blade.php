@@ -32,7 +32,7 @@
                             </a>
                         </div>
                     @else
-                        <form method="POST" action="{{ route('student.upload.store') }}" enctype="multipart/form-data">
+                        <form id="uploadForm" method="POST" action="{{ route('student.upload.store') }}" enctype="multipart/form-data">
                             @csrf
 
                             {{-- Info notice --}}
@@ -84,7 +84,7 @@
             const progressWrapper = document.getElementById('progressWrapper');
             const progressBar = document.getElementById('uploadProgressBar');
             const progressText = document.getElementById('progressText');
-            const form = document.querySelector('form');
+            const form = document.getElementById('uploadForm');
 
             if(uploadBtn) {
                 uploadBtn.addEventListener('click', function(e) {
