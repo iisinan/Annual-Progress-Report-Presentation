@@ -179,9 +179,17 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-center p-4">
+                    @if($slot->student->presentation->presentation_title)
+                    <div class="mb-4 text-start">
+                        <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-align-left me-2"></i>Abstract</h6>
+                        <div class="p-3 bg-light border rounded text-muted" style="font-size: 0.9rem; line-height: 1.5; font-style: italic; max-height: 150px; overflow-y: auto;">
+                            {{ $slot->student->presentation->presentation_title }}
+                        </div>
+                    </div>
+                    @endif
                     <p class="mb-4 text-muted">What would you like to do with this presentation file?</p>
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                        <a href="{{ Storage::disk('r2')->url($slot->student->presentation->file_path) }}" target="_blank" class="btn btn-primary px-4 py-2">
+                        <a href="{{ route('presentations.view', $slot->student->presentation->id) }}" target="_blank" class="btn btn-primary px-4 py-2">
                             <i class="fa-solid fa-eye me-2"></i> View Presentation
                         </a>
                         <a href="{{ route('presentations.download', $slot->student->presentation->id) }}" class="btn btn-outline-success px-4 py-2">

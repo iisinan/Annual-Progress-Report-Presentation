@@ -37,6 +37,35 @@ class FileDownloadController extends Controller
             ]);
         }
 
-        return redirect(Storage::disk('r2')->temporaryUrl($presentation->file_path, now()->addMinutes(30)));
+        // Enforce attachment download
+        return redirect(Storage::disk('r2')->temporaryUrl(
+            $presentation->file_path, 
+            now()->addMinutes(30),
+            ['ResponseContentDisposition' => 'attachment; filename="' . $presentation->original_filename . '"']
+        ));
+    }
+
+    public function viewPresentation(Presentation $presentation, Request $request)
+    {
+        // Check authorization
+        $user = Auth::user();
+        if (!$user->hasRole('Administrator') && !$user->hasRole('Examiner') && (!isset($user->student) || $user->student->id !== $presentation->student_id)) {
+            abort(403, 'Unauthorized access to this file.');
+        }
+
+        if (!Storage::disk('r2')->exists($presentation->file_path)) {
+            // Fallback for local files
+            if (Storage::disk('private')->exists($presentation->file_path)) {
+                return response()->file(Storage::disk('private')->path($presentation->file_path));
+            }
+            abort(404, 'File not found on the server or Cloudflare R2.');
+        }
+
+        // Enforce inline viewing
+        return redirect(Storage::disk('r2')->temporaryUrl(
+            $presentation->file_path, 
+            now()->addMinutes(30),
+            ['ResponseContentType' => 'application/pdf', 'ResponseContentDisposition' => 'inline; filename="' . $presentation->original_filename . '"']
+        ));
     }
 }

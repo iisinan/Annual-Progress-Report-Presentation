@@ -77,6 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::middleware(['role:Examiner|Administrator'])->group(function () {
         Route::get('/presentations/{presentation}/download', [FileDownloadController::class, 'downloadPresentation'])->name('presentations.download');
+    Route::get('/presentations/{presentation}/view', [FileDownloadController::class, 'viewPresentation'])->name('presentations.view');
     });
     Route::middleware(['role:Examiner'])->prefix('examiner')->name('examiner.')->group(function () {
         Route::get('/students', [AdminController::class, 'students'])->name('students'); // Shared view or separate

@@ -62,6 +62,16 @@
                         <div class="col-md-4 text-muted fw-bold">Current Stage</div>
                         <div class="col-md-8"><span class="badge bg-secondary">{{ $student->current_research_stage }}</span></div>
                     </div>
+                    @if($student->presentation && $student->presentation->presentation_title)
+                    <div class="row mt-4 border-top pt-3">
+                        <div class="col-12">
+                            <h6 class="text-primary fw-bold mb-2"><i class="fa-solid fa-align-left me-2"></i>Abstract</h6>
+                            <div class="p-3 bg-light border rounded text-muted" style="font-size: 0.95rem; line-height: 1.6; font-style: italic;">
+                                {{ $student->presentation->presentation_title }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -165,7 +175,7 @@
                 <div class="modal-body text-center p-4">
                     <p class="mb-4 text-muted">What would you like to do with this presentation file?</p>
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                        <a href="{{ Storage::disk('r2')->url($student->presentation->file_path) }}" target="_blank" class="btn btn-primary px-4 py-2">
+                        <a href="{{ route('presentations.view', $student->presentation->id) }}" target="_blank" class="btn btn-primary px-4 py-2">
                             <i class="fa-solid fa-eye me-2"></i> View Presentation
                         </a>
                         <a href="{{ route('presentations.download', $student->presentation->id) }}" class="btn btn-outline-success px-4 py-2">
