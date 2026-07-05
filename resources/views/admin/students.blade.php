@@ -127,6 +127,35 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="academic_session" class="form-label">Academic Session</label>
+                                <select class="form-select" id="academic_session" name="academic_session" required>
+                                    <option value="">Select Session</option>
+                                    @php $currentYear = date('Y'); @endphp
+                                    @for($year = $currentYear; $year >= 2020; $year--)
+                                        <option value="{{ $year }}/{{ $year+1 }}">{{ $year }}/{{ $year+1 }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="year_of_admission" class="form-label">Year of Admission</label>
+                                <select class="form-select" id="year_of_admission" name="year_of_admission" required>
+                                    <option value="">Select Year</option>
+                                    @for($year = $currentYear; $year >= 2010; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="intake" class="form-label">Intake Batch</label>
+                                <select class="form-select" id="intake" name="intake" required>
+                                    <option value="">Select Intake</option>
+                                    <option value="1">Intake 1 (First Semester)</option>
+                                    <option value="2">Intake 2 (Second Semester)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="department_id" class="form-label">Department</label>
                                 <select class="form-select" id="department_id" name="department_id" required>

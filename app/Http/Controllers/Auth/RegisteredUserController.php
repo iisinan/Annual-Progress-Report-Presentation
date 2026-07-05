@@ -57,6 +57,8 @@ class RegisteredUserController extends Controller
             'phone_number' => ['required', 'string', 'max:20', 'unique:students,phone_number'],
             'department_id' => ['required', 'exists:departments,id'],
             'programme_id' => ['required', 'exists:programmes,id'],
+            'year_of_admission' => ['required', 'integer', 'min:2010', 'max:' . date('Y')],
+            'intake' => ['required', 'integer', 'in:1,2'],
             'supervisor_name' => ['required', 'string', 'max:255'],
             'research_title' => ['required', 'string', 'max:500'],
             'presentation_title' => ['required', 'string', 'max:500'],
@@ -77,6 +79,9 @@ class RegisteredUserController extends Controller
             $student = Student::create([
                 'user_id' => $user->id,
                 'matric_number' => $request->matric_number,
+                'academic_session' => $request->academic_session,
+                'year_of_admission' => $request->year_of_admission,
+                'intake' => $request->intake,
                 'phone_number' => $request->phone_number,
                 'department_id' => $request->department_id,
                 'programme_id' => $request->programme_id,

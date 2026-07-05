@@ -18,6 +18,8 @@ class Student extends Model
         'department_id',
         'matric_number',
         'academic_session',
+        'year_of_admission',
+        'intake',
         'phone_number',
         'supervisor_name',
         'research_title',
@@ -52,5 +54,42 @@ class Student extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->latest();
+    }
+
+    public function getDurationInfoAttribute()
+    {
+        if (!$this->year_of_admission || !$this->intake) return null;
+        
+        $currentYear = (int) date('Y');
+        $currentMonth = (int) date('m');
+        $currentIntake = $currentMonth >= 7 ? 2 : 1; 
+        
+        $yearsElapsed = $currentYear - $this->year_of_admission;
+        
+        // Semesters elapsed: 2 semesters per year
+        $semestersElapsed = ($yearsElapsed * 2) + ($currentIntake - $this->intake);
+        
+        // Minimum required (MSc = 3, PhD = 6)
+        $progName = strtolower($this->programme->name ?? '');
+        $minSemesters = (str_contains($progName, 'phd') || str_contains($progName, 'doctor')) ? 6 : 3;
+        
+        $status = 'In Progress';
+        if ($semestersElapsed >= $minSemesters) {
+            $status = 'Eligible to Graduate';
+            if ($semestersElapsed > $minSemesters + 2) {
+                 $status = 'Overstayed';
+            }
+        }
+        
+        return [
+            'semesters_spent' => max(0, $semestersElapsed),
+            'min_required' => $minSemesters,
+            'status' => $status,
+        ];
     }
 }

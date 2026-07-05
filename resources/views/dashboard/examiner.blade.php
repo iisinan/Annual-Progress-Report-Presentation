@@ -101,6 +101,10 @@
                                             <i class="fa-solid fa-clipboard-check"></i> Grade
                                         </button>
                                     @endif
+                                    
+                                    <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#commentModal{{ $slot->id }}" title="Leave Comment">
+                                        <i class="fa-solid fa-comment-dots"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -226,6 +230,31 @@
         </div>
     </div>
     @endif
+
+    <!-- Comment Modal for Slot {{ $slot->id }} -->
+    <div class="modal fade" id="commentModal{{ $slot->id }}" tabindex="-1" aria-labelledby="commentModalLabel{{ $slot->id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('examiner.comments.store', $slot->student->id) }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="commentModalLabel{{ $slot->id }}"><i class="fa-solid fa-comment-dots me-2"></i> Add Comment</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Comment (Visible to Student and Admin)</label>
+                            <textarea class="form-control" name="body" rows="4" required placeholder="Type your observations, questions, or feedback here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info text-white">Save Comment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     @endforeach
 
     @push('scripts')

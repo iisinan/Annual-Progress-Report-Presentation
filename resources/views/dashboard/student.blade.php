@@ -131,10 +131,52 @@
                 <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Supervisor</div>
                 <div class="col-md-9">{{ $student->supervisor_name }}</div>
             </div>
-            <div class="row py-2">
+            <div class="row py-2 border-bottom">
                 <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Current Stage</div>
                 <div class="col-md-9"><span class="badge px-3 py-2" style="background:var(--acetel-green);">{{ $student->current_research_stage }}</span></div>
             </div>
+            @php $durationInfo = $student->duration_info; @endphp
+            @if($durationInfo)
+            <div class="row py-2 pt-3">
+                <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Duration Status</div>
+                <div class="col-md-9">
+                    @if($durationInfo['status'] === 'Eligible to Graduate')
+                        <span class="badge bg-success px-3 py-2">Eligible to Graduate</span>
+                    @elseif($durationInfo['status'] === 'Overstayed')
+                        <span class="badge bg-danger px-3 py-2">Overstayed</span>
+                    @else
+                        <span class="badge bg-primary px-3 py-2">In Progress</span>
+                    @endif
+                    <small class="text-muted ms-2 d-block d-sm-inline mt-2 mt-sm-0">
+                        Semesters Spent: <strong>{{ $durationInfo['semesters_spent'] }}</strong> / Min Required: <strong>{{ $durationInfo['min_required'] }}</strong>
+                    </small>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Examiner Comments Timeline -->
+    <div class="card mb-4">
+        <div class="card-header py-3" style="background:var(--acetel-green-pale);border-bottom:2px solid var(--acetel-green);">
+            <h6 class="m-0 fw-bold" style="color:var(--acetel-green);"><i class="fa-solid fa-comments me-2"></i>Examiner Comments</h6>
+        </div>
+        <div class="card-body">
+            @if($student->comments && $student->comments->count() > 0)
+                <div class="timeline">
+                    @foreach($student->comments as $comment)
+                    <div class="border-start border-3 ps-3 mb-4" style="border-color: var(--acetel-green) !important;">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="fw-bold mb-1">{{ $comment->user->name }} (Examiner)</h6>
+                            <small class="text-muted">{{ $comment->created_at->format('M d, Y h:i A') }}</small>
+                        </div>
+                        <p class="mb-0 text-muted">{{ $comment->body }}</p>
+                    </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-muted mb-0 text-center py-3">No examiner comments yet.</p>
+            @endif
         </div>
     </div>
 

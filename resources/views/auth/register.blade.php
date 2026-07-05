@@ -76,6 +76,34 @@
                 @enderror
             </div>
 
+            <!-- Year of Admission -->
+            <div class="col-md-6">
+                <label for="year_of_admission" class="form-label">Year of Admission</label>
+                <select class="form-select @error('year_of_admission') is-invalid @enderror" id="year_of_admission" name="year_of_admission" required>
+                    <option value="" disabled selected>Select Year...</option>
+                    @php $currentYear = date('Y'); @endphp
+                    @for($year = $currentYear; $year >= 2010; $year--)
+                        <option value="{{ $year }}" {{ old('year_of_admission') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endfor
+                </select>
+                @error('year_of_admission')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <!-- Intake -->
+            <div class="col-md-6">
+                <label for="intake" class="form-label">Intake Batch</label>
+                <select class="form-select @error('intake') is-invalid @enderror" id="intake" name="intake" required>
+                    <option value="" disabled selected>Select Intake...</option>
+                    <option value="1" {{ old('intake') == '1' ? 'selected' : '' }}>Intake 1 (First Semester)</option>
+                    <option value="2" {{ old('intake') == '2' ? 'selected' : '' }}>Intake 2 (Second Semester)</option>
+                </select>
+                @error('intake')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             <!-- Supervisor Name -->
             <div class="col-md-6">
                 <label for="supervisor_name" class="form-label">Supervisor Name</label>

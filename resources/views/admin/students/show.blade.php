@@ -62,6 +62,25 @@
                         <div class="col-md-4 text-muted fw-bold">Current Stage</div>
                         <div class="col-md-8"><span class="badge bg-secondary">{{ $student->current_research_stage }}</span></div>
                     </div>
+                    
+                    @php $durationInfo = $student->duration_info; @endphp
+                    @if($durationInfo)
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-4 text-muted fw-bold">Duration Status</div>
+                        <div class="col-md-8">
+                            @if($durationInfo['status'] === 'Eligible to Graduate')
+                                <span class="badge bg-success">Eligible to Graduate</span>
+                            @elseif($durationInfo['status'] === 'Overstayed')
+                                <span class="badge bg-danger">Overstayed</span>
+                            @else
+                                <span class="badge bg-primary">In Progress</span>
+                            @endif
+                            <small class="text-muted d-block mt-1">
+                                Semesters Spent: <strong>{{ $durationInfo['semesters_spent'] }}</strong> / Min Required: <strong>{{ $durationInfo['min_required'] }}</strong>
+                            </small>
+                        </div>
+                    </div>
+                    @endif
                     @if($student->presentation && $student->presentation->presentation_title)
                     <div class="row mt-4 border-top pt-3">
                         <div class="col-12">
@@ -157,6 +176,30 @@
                             <i class="fa-solid fa-clipboard-check fa-3x mb-3 text-gray-300"></i>
                             <p class="mb-0">No reviews have been submitted for this presentation yet.</p>
                         </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Examiner Comments Timeline -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 fw-bold text-info"><i class="fa-solid fa-comments me-2"></i> Examiner Comments</h6>
+                </div>
+                <div class="card-body">
+                    @if($student->comments && $student->comments->count() > 0)
+                        <div class="timeline">
+                            @foreach($student->comments as $comment)
+                            <div class="border-start border-3 border-info ps-3 mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="fw-bold mb-1">{{ $comment->user->name }} (Examiner)</h6>
+                                    <small class="text-muted">{{ $comment->created_at->format('M d, Y h:i A') }}</small>
+                                </div>
+                                <p class="mb-0 text-muted">{{ $comment->body }}</p>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted mb-0 text-center py-3">No examiner comments yet.</p>
                     @endif
                 </div>
             </div>

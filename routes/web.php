@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:Examiner|Administrator'])->group(function () {
         Route::get('/admin/students/{student}', [AdminController::class, 'showStudent'])->name('admin.students.show');
         Route::post('/examiner/reviews/{student}', [\App\Http\Controllers\ReviewController::class, 'store'])->name('examiner.reviews.store');
+        Route::post('/examiner/comments/{student}', [\App\Http\Controllers\CommentController::class, 'store'])->name('examiner.comments.store');
         Route::put('/admin/schedule/{schedule}', [ScheduleController::class, 'update'])->name('admin.schedule.update');
         Route::get('/admin/reports/schedule/pdf', [ReportController::class, 'exportSchedulePdf'])->name('admin.reports.schedule.pdf');
     });
