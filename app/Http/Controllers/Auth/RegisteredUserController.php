@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'matric_number' => ['required', 'string', 'max:255', 'unique:students,matric_number'],
-            'phone_number' => ['required', 'string', 'max:20'],
+            'phone_number' => ['required', 'string', 'max:20', 'unique:students,phone_number'],
             'department_id' => ['required', 'exists:departments,id'],
             'programme_id' => ['required', 'exists:programmes,id'],
             'supervisor_name' => ['required', 'string', 'max:255'],
