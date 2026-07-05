@@ -37,6 +37,6 @@ class FileDownloadController extends Controller
             ]);
         }
 
-        return Storage::disk('r2')->download($presentation->file_path, $presentation->original_filename);
+        return redirect(Storage::disk('r2')->temporaryUrl($presentation->file_path, now()->addMinutes(30)));
     }
 }
