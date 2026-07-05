@@ -64,6 +64,7 @@
                                     <a href="{{ route('admin.students.show', $student->id) }}" class="btn btn-sm btn-outline-primary" title="View Profile">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    @if(auth()->user()->hasRole('Administrator'))
                                     <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student and all their records?');">
                                         @csrf
                                         @method('DELETE')
@@ -71,6 +72,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

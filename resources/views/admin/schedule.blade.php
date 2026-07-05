@@ -70,6 +70,7 @@
                                     <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editScheduleModal{{ $schedule->id }}">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
+                                    @if(auth()->user()->hasRole('Administrator'))
                                     <form action="{{ route('admin.schedule.destroy', $schedule->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this presentation schedule?');">
                                         @csrf
                                         @method('DELETE')
@@ -77,6 +78,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
