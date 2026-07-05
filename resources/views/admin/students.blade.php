@@ -155,7 +155,7 @@
                             <textarea class="form-control" id="research_title" name="research_title" rows="2" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="presentation_title" class="form-label">Presentation Title</label>
+                            <label for="presentation_title" class="form-label">Abstract</label>
                             <textarea class="form-control" id="presentation_title" name="presentation_title" rows="2" required></textarea>
                         </div>
                         <div class="mb-3">

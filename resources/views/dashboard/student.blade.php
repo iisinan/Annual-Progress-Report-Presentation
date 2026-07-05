@@ -124,7 +124,7 @@
                 <div class="col-md-9 fw-bold">{{ $student->research_title }}</div>
             </div>
             <div class="row mb-3 py-2 border-bottom">
-                <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Presentation Title</div>
+                <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Abstract</div>
                 <div class="col-md-9">{{ $presentation->presentation_title ?? 'N/A' }}</div>
             </div>
             <div class="row mb-3 py-2 border-bottom">

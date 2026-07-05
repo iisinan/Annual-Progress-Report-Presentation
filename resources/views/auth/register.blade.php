@@ -110,9 +110,9 @@
                 @enderror
             </div>
 
-            <!-- Presentation Title -->
+            <!-- Abstract -->
             <div class="col-md-12">
-                <label for="presentation_title" class="form-label">Presentation Title</label>
+                <label for="presentation_title" class="form-label">Abstract</label>
                 <textarea class="form-control @error('presentation_title') is-invalid @enderror" id="presentation_title" name="presentation_title" rows="2" required>{{ old('presentation_title') }}</textarea>
                 @error('presentation_title')
                     <div class="invalid-feedback">{{ $message }}</div>
