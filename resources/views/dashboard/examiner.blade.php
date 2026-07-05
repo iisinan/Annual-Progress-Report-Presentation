@@ -101,9 +101,8 @@
                                             <i class="fa-solid fa-clipboard-check"></i> Grade
                                         </button>
                                     @endif
-                                    
                                     <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#commentModal{{ $slot->id }}" title="Leave Comment">
-                                        <i class="fa-solid fa-comment-dots"></i>
+                                        <i class="fa-solid fa-comment-dots"></i> Comment
                                     </button>
                                 </div>
                             </td>

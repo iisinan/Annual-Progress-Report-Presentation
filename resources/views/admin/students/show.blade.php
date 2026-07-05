@@ -3,7 +3,7 @@
         Student Profile: {{ $student->user->name }}
     </x-slot>
     <x-slot name="actions">
-        <a href="{{ route('admin.students') }}" class="btn btn-secondary shadow-sm"><i class="fa-solid fa-arrow-left me-2"></i> Back to Students</a>
+        <a href="{{ auth()->user()->hasRole('Administrator') ? route('admin.students') : route('examiner.students') }}" class="btn btn-secondary shadow-sm"><i class="fa-solid fa-arrow-left me-2"></i> Back to Students</a>
     </x-slot>
 
     <div class="row">

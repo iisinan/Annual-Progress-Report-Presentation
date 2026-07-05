@@ -56,12 +56,102 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-acetel w-100 py-2">
+                            <div class="mb-4" id="progressWrapper" style="display: none;">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="small fw-bold" style="color:var(--acetel-green);">Uploading...</span>
+                                    <span class="small fw-bold" id="progressText" style="color:var(--acetel-green);">0%</span>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="uploadProgressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+                            <button type="button" id="uploadButton" class="btn btn-acetel w-100 py-2">
                                 <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload PDF Presentation
                             </button>
                         </form>
                     @endif
                 </div>
+            </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const uploadBtn = document.getElementById('uploadButton');
+            const fileInput = document.getElementById('presentation_file');
+            const progressWrapper = document.getElementById('progressWrapper');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('progressText');
+            const form = document.querySelector('form');
+
+            if(uploadBtn) {
+                uploadBtn.addEventListener('click', function(e) {
+                    if (!fileInput.files.length) {
+                        alert('Please select a PDF file first.');
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    uploadBtn.disabled = true;
+                    uploadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Uploading... Please wait';
+                    progressWrapper.style.display = 'block';
+
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+                    
+                    xhr.open('POST', form.action, true);
+                    
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percentComplete = Math.round((e.loaded / e.total) * 100);
+                            progressBar.style.width = percentComplete + '%';
+                            progressBar.setAttribute('aria-valuenow', percentComplete);
+                            progressText.innerText = percentComplete + '%';
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                            progressBar.style.width = '100%';
+                            progressText.innerText = '100%';
+                            progressText.innerText = 'Upload Complete! Reloading...';
+                            
+                            // It returns a redirect normally, or success response
+                            window.location.reload();
+                        } else {
+                            alert('An error occurred during the upload. Please try again.');
+                            uploadBtn.disabled = false;
+                            uploadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload PDF Presentation';
+                            progressWrapper.style.display = 'none';
+                            
+                            // Check if validation error
+                            if(xhr.status === 422) {
+                                try {
+                                    let res = JSON.parse(xhr.responseText);
+                                    if(res.errors && res.errors.presentation_file) {
+                                        alert(res.errors.presentation_file[0]);
+                                    }
+                                } catch(e){}
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function() {
+                        alert('Network Error. Please check your connection and try again.');
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload PDF Presentation';
+                        progressWrapper.style.display = 'none';
+                    };
+
+                    // Send the form data
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.send(formData);
+                });
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>
