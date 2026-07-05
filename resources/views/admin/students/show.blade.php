@@ -182,17 +182,20 @@
 
             <!-- Examiner Comments Timeline -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white py-3">
                     <h6 class="m-0 fw-bold text-info"><i class="fa-solid fa-comments me-2"></i> Examiner Comments</h6>
-                    @if(auth()->user()->hasRole('Examiner'))
-                        <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#commentModal">
-                            <i class="fa-solid fa-comment-dots"></i> Leave Comment
-                        </button>
-                    @endif
                 </div>
                 <div class="card-body">
+                    @if(auth()->user()->hasRole('Examiner'))
+                        <div class="mb-4 text-center">
+                            <button class="btn btn-info btn-lg text-white shadow-sm px-5 py-3 fw-bold" data-bs-toggle="modal" data-bs-target="#commentModal" style="border-radius: 50px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fa-solid fa-comment-medical me-2 fa-lg"></i> Add Comments
+                            </button>
+                        </div>
+                    @endif
+
                     @if($student->comments && $student->comments->count() > 0)
-                        <div class="timeline">
+                        <div class="timeline mt-4">
                             @foreach($student->comments as $comment)
                             <div class="border-start border-3 border-info ps-3 mb-4">
                                 <div class="d-flex justify-content-between">
@@ -204,7 +207,10 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-muted mb-0 text-center py-3">No examiner comments yet.</p>
+                        <div class="text-center py-4 bg-light rounded-3">
+                            <i class="fa-solid fa-comment-slash fa-3x text-muted mb-3 opacity-50"></i>
+                            <p class="text-muted mb-0">No examiner comments yet.</p>
+                        </div>
                     @endif
                 </div>
             </div>
