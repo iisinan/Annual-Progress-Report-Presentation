@@ -297,7 +297,7 @@
                             <i class="fa-solid fa-clock fa-2x"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Scheduling</h4>
-                        <p class="text-muted">Once registered and successfully uploaded, students will be automatically assigned a time slot and venue. An acknowledgement slip must be downloaded and printed.</p>
+                        <p class="text-muted">Once registered and successfully uploaded, students will be automatically assigned a time slot and venue. An acknowledgement slip should be downloaded and kept for reference. If you need any assistance, please send an email to Dr. Ismaila Idris Sinan via <a href="mailto:isinan@noun.edu.ng">isinan@noun.edu.ng</a>.</p>
                     </div>
                 </div>
             </div>
