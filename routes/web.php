@@ -37,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin Routes
     Route::middleware(['role:Administrator'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/students', [AdminController::class, 'students'])->name('students');
+        Route::post('/students/store', [AdminController::class, 'storeStudent'])->name('students.store');
         Route::delete('/students/{student}', [AdminController::class, 'destroyStudent'])->name('students.destroy');
         Route::get('/examiners', [AdminController::class, 'examiners'])->name('examiners');
         Route::post('/examiners/store', [AdminController::class, 'storeExaminer'])->name('examiners.store');
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
         Route::post('/schedule/generate', [ScheduleController::class, 'generate'])->name('schedule.generate');
         Route::post('/schedule/clear', [ScheduleController::class, 'clear'])->name('schedule.clear');
+        Route::put('/schedule/{schedule}', [ScheduleController::class, 'update'])->name('schedule.update');
+        Route::delete('/schedule/{schedule}', [ScheduleController::class, 'destroy'])->name('schedule.destroy');
         
         // Reports
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

@@ -127,4 +127,19 @@ class ScheduleController extends Controller
 
         return redirect()->back()->with('success', 'Schedule updated successfully.');
     }
+
+    public function destroy(Request $request, Schedule $schedule)
+    {
+        $studentName = $schedule->student->user->name;
+        $schedule->delete();
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => "Canceled presentation schedule for student: " . $studentName,
+            'model_type' => 'Schedule',
+            'ip_address' => $request->ip()
+        ]);
+
+        return redirect()->back()->with('success', 'Presentation schedule for ' . $studentName . ' has been canceled.');
+    }
 }

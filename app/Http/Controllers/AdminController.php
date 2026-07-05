@@ -10,6 +10,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Models\Presentation;
+use Illuminate\Support\Facades\DB;
+use App\Models\Department;
+use App\Models\Programme;
 
 class AdminController extends Controller
 {
@@ -26,8 +30,10 @@ class AdminController extends Controller
 
         $students = $query->latest()->get();
         $sessions = Student::select('academic_session')->distinct()->pluck('academic_session');
+        $departments = Department::all();
+        $programmes = Programme::all();
 
-        return view('admin.students', compact('students', 'currentSession', 'session', 'sessions'));
+        return view('admin.students', compact('students', 'currentSession', 'session', 'sessions', 'departments', 'programmes'));
     }
 
     public function showStudent(Student $student)
@@ -38,8 +44,13 @@ class AdminController extends Controller
 
     public function destroyStudent(Student $student)
     {
-        $name = $student->user->name;
-        $student->user->delete(); // This cascades to the student record due to our migration
+        $name = $student->user ? $student->user->name : 'Unknown Student';
+        
+        if ($student->user) {
+            $student->user->delete(); // Soft deletes the user
+        }
+        
+        $student->delete(); // Explicitly soft delete the student to prevent it from showing up
 
         AuditLog::create([
             'user_id' => Auth::id(),
@@ -49,6 +60,61 @@ class AdminController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Student deleted successfully.');
+    }
+
+    public function storeStudent(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'matric_number' => ['required', 'string', 'max:255', 'unique:students,matric_number'],
+            'phone_number' => ['required', 'string', 'max:20', 'unique:students,phone_number'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'programme_id' => ['required', 'exists:programmes,id'],
+            'supervisor_name' => ['required', 'string', 'max:255'],
+            'research_title' => ['required', 'string', 'max:500'],
+            'presentation_title' => ['required', 'string', 'max:500'],
+            'current_research_stage' => ['required', 'string', 'max:255'],
+        ]);
+
+        $student = null;
+        DB::transaction(function () use ($request, &$student) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $user->assignRole('Student');
+
+            $student = Student::create([
+                'user_id' => $user->id,
+                'matric_number' => $request->matric_number,
+                'phone_number' => $request->phone_number,
+                'department_id' => $request->department_id,
+                'programme_id' => $request->programme_id,
+                'supervisor_name' => $request->supervisor_name,
+                'research_title' => $request->research_title,
+                'current_research_stage' => $request->current_research_stage,
+                'academic_session' => SystemSetting::where('key', 'current_session')->value('value') ?? '2025/2026',
+            ]);
+
+            Presentation::create([
+                'student_id' => $student->id,
+                'presentation_title' => $request->presentation_title,
+                'status' => 'pending',
+            ]);
+        });
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Created New Student: ' . $request->matric_number,
+            'model_type' => 'Student',
+            'ip_address' => $request->ip()
+        ]);
+
+        return redirect()->back()->with('success', 'Student account created successfully!');
     }
 
     public function examiners()

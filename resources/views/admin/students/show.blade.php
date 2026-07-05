@@ -69,9 +69,9 @@
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 fw-bold text-primary">Presentation & Schedule</h6>
                     @if($student->presentation && $student->presentation->file_path)
-                        <a href="{{ Storage::disk('r2')->url($student->presentation->file_path) }}" target="_blank" class="btn btn-sm btn-outline-success">
-                            <i class="fa-solid fa-download me-1"></i> Download PPT
-                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#pptActionModal">
+                            <i class="fa-solid fa-file-pdf me-1"></i> Presentation Options
+                        </button>
                     @else
                         <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Not Uploaded</span>
                     @endif
@@ -152,4 +152,29 @@
             </div>
         </div>
     </div>
+
+    <!-- PPT Action Modal -->
+    @if($student->presentation && $student->presentation->file_path)
+    <div class="modal fade" id="pptActionModal" tabindex="-1" aria-labelledby="pptActionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="pptActionModalLabel"><i class="fa-solid fa-file-pdf me-2"></i> Presentation File Options</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="mb-4 text-muted">What would you like to do with this presentation file?</p>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        <a href="{{ Storage::disk('r2')->url($student->presentation->file_path) }}" target="_blank" class="btn btn-primary px-4 py-2">
+                            <i class="fa-solid fa-eye me-2"></i> View Presentation
+                        </a>
+                        <a href="{{ route('presentations.download', $student->presentation->id) }}" class="btn btn-outline-success px-4 py-2">
+                            <i class="fa-solid fa-download me-2"></i> Download Presentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </x-app-layout>

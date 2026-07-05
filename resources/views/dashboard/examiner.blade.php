@@ -86,9 +86,9 @@
                             <td>
                                 <div class="d-flex gap-2">
                                     @if($slot->student->presentation)
-                                        <a href="{{ route('presentations.download', $slot->student->presentation->id) }}" class="btn btn-sm btn-outline-primary" title="Download PDF">
-                                            <i class="fa-solid fa-download"></i>
-                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#pptActionModal{{ $slot->id }}" title="Presentation Options">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </button>
                                     @else
                                         <span class="text-muted" title="Pending"><i class="fa-solid fa-triangle-exclamation text-warning"></i></span>
                                     @endif
@@ -173,6 +173,31 @@
             </div>
         </div>
     </div>
+
+    @if($slot->student->presentation && $slot->student->presentation->file_path)
+    <!-- PPT Action Modal for Slot {{ $slot->id }} -->
+    <div class="modal fade" id="pptActionModal{{ $slot->id }}" tabindex="-1" aria-labelledby="pptActionModalLabel{{ $slot->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="pptActionModalLabel{{ $slot->id }}"><i class="fa-solid fa-file-pdf me-2"></i> Presentation File Options</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="mb-4 text-muted">What would you like to do with this presentation file?</p>
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                        <a href="{{ Storage::disk('r2')->url($slot->student->presentation->file_path) }}" target="_blank" class="btn btn-primary px-4 py-2">
+                            <i class="fa-solid fa-eye me-2"></i> View Presentation
+                        </a>
+                        <a href="{{ route('presentations.download', $slot->student->presentation->id) }}" class="btn btn-outline-success px-4 py-2">
+                            <i class="fa-solid fa-download me-2"></i> Download Presentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
     @endforeach
 
     @push('scripts')
