@@ -69,10 +69,11 @@ class DatabaseSeeder extends Seeder
                 'current_research_stage' => 'Data Collection',
             ]
         );
-        // Create 15 Dummy Students for testing
-        $departments = \App\Models\Department::all();
-        $programmes = \App\Models\Programme::all();
-        $faker = \Faker\Factory::create();
+        // Create 15 Dummy Students for testing (only in local environment where Faker is installed)
+        if (app()->environment('local') && class_exists(\Faker\Factory::class)) {
+            $departments = \App\Models\Department::all();
+            $programmes = \App\Models\Programme::all();
+            $faker = \Faker\Factory::create();
 
         if ($departments->count() > 0 && $programmes->count() > 0) {
             for ($i = 1; $i <= 15; $i++) {
@@ -99,6 +100,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 );
             }
+        }
         }
     }
 }
