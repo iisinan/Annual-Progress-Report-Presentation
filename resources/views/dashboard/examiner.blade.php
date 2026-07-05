@@ -189,13 +189,38 @@
                     @endif
                     <p class="mb-4 text-muted">What would you like to do with this presentation file?</p>
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                        <a href="{{ route('presentations.view', $slot->student->presentation->id) }}" target="_blank" class="btn btn-primary px-4 py-2">
+                        <button class="btn btn-primary px-4 py-2" data-bs-target="#pptPreviewModal{{ $slot->id }}" data-bs-toggle="modal" data-bs-dismiss="modal">
                             <i class="fa-solid fa-eye me-2"></i> View Presentation
-                        </a>
+                        </button>
                         <a href="{{ route('presentations.download', $slot->student->presentation->id) }}" class="btn btn-outline-success px-4 py-2">
                             <i class="fa-solid fa-download me-2"></i> Download Presentation
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($slot->student->presentation && $slot->student->presentation->file_path)
+    <!-- PPT Preview Modal for Slot {{ $slot->id }} -->
+    <div class="modal fade" id="pptPreviewModal{{ $slot->id }}" tabindex="-1" aria-labelledby="pptPreviewModalLabel{{ $slot->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="height: 90vh;">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="pptPreviewModalLabel{{ $slot->id }}"><i class="fa-solid fa-file-pdf me-2 text-danger"></i> Document Preview</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ route('presentations.view', $slot->student->presentation->id) }}" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button class="btn btn-secondary" data-bs-target="#pptActionModal{{ $slot->id }}" data-bs-toggle="modal" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Options
+                    </button>
+                    <a href="{{ route('presentations.download', $slot->student->presentation->id) }}" class="btn btn-success">
+                        <i class="fa-solid fa-download me-1"></i> Download
+                    </a>
                 </div>
             </div>
         </div>
