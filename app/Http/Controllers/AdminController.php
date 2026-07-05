@@ -46,11 +46,25 @@ class AdminController extends Controller
     {
         $name = $student->user ? $student->user->name : 'Unknown Student';
         
-        if ($student->user) {
-            $student->user->delete(); // Soft deletes the user
+        // Wipe out related data
+        if ($student->presentation) {
+            $student->presentation()->forceDelete();
         }
+        if ($student->schedule) {
+            $student->schedule()->forceDelete();
+        }
+        $student->reviews()->forceDelete();
+        $student->comments()->forceDelete();
+
+        $user = $student->user;
         
-        $student->delete(); // Explicitly soft delete the student to prevent it from showing up
+        // Force delete the student
+        $student->forceDelete(); 
+
+        if ($user) {
+            // Force delete the user to allow re-registration with same email
+            $user->forceDelete(); 
+        }
 
         AuditLog::create([
             'user_id' => Auth::id(),
