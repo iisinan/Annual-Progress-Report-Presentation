@@ -103,6 +103,7 @@
                     const xhr = new XMLHttpRequest();
                     
                     xhr.open('POST', form.action, true);
+                    xhr.setRequestHeader('Accept', 'application/json');
                     
                     xhr.upload.onprogress = function(e) {
                         if (e.lengthComputable) {
