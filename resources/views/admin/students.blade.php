@@ -44,8 +44,8 @@
                         @forelse($students as $student)
                         <tr>
                             <td>{{ $student->matric_number }}</td>
-                            <td>{{ $student->user->name }}</td>
-                            <td>{{ $student->user->email }}</td>
+                            <td>{{ $student->user->name ?? 'Unknown (Deleted User)' }}</td>
+                            <td>{{ $student->user->email ?? 'Unknown' }}</td>
                             <td>{{ $student->programme->name }}</td>
                             <td>{{ $student->department->name }}</td>
                             <td>

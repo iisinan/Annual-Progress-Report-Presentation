@@ -1,18 +1,15 @@
 <x-app-layout>
-    <x-slot name="header">Admin Dashboard</x-slot>
+    <x-slot name="header">
+        <i class="fa-solid fa-gauge me-2"></i> Admin Dashboard<br>
+        <small style="color:rgba(255,255,255,0.7); font-size: 0.65em; font-weight: normal; font-family: 'Inter', sans-serif;">Welcome back, {{ Auth::user()->name }} &mdash; {{ now()->format('l, d F Y') }}</small>
+    </x-slot>
 
-    <!-- Welcome Banner -->
-
-    <div class="page-title-bar mb-4">
-        <div>
-            <h1><i class="fa-solid fa-gauge me-2"></i> Admin Dashboard</h1>
-            <small style="color:rgba(255,255,255,0.7);">Welcome back, {{ Auth::user()->name }} &mdash; {{ now()->format('l, d F Y') }}</small>
-        </div>
+    <x-slot name="actions">
         <div class="d-flex gap-2">
             <a href="{{ route('admin.schedule.index') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:8px;"><i class="fa-solid fa-calendar-days me-1"></i> Schedule</a>
             <a href="{{ route('admin.reports.index') }}" class="btn btn-sm" style="background:rgba(248,180,0,0.9);color:#145e27;font-weight:700;border-radius:8px;"><i class="fa-solid fa-chart-bar me-1"></i> Reports</a>
         </div>
-    </div>
+    </x-slot>
 
     <!-- Row 1: Key Stats -->
     <div class="row g-3 mb-4">

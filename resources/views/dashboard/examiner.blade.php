@@ -1,13 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">Examiner Dashboard</x-slot>
-
-    <!-- Welcome Banner -->
-    <div class="page-title-bar mb-4">
-        <div>
-            <h1><i class="fa-solid fa-chalkboard-user me-2"></i> Examiner Dashboard</h1>
-            <small style="color:rgba(255,255,255,0.75);">Welcome back, {{ Auth::user()->name }} &mdash; {{ now()->format('l, d F Y') }}</small>
-        </div>
-    </div>
+    <x-slot name="header">
+        <i class="fa-solid fa-chalkboard-user me-2"></i> Examiner Dashboard<br>
+        <small style="color:rgba(255,255,255,0.7); font-size: 0.65em; font-weight: normal; font-family: 'Inter', sans-serif;">Welcome back, {{ Auth::user()->name }} &mdash; {{ now()->format('l, d F Y') }}</small>
+    </x-slot>
 
     <!-- Stat Cards -->
     <div class="row g-3 mb-4">

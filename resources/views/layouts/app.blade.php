@@ -455,6 +455,19 @@
                     </div>
                 @endif
 
+                @if(isset($header))
+                    <div class="page-title-bar mb-4">
+                        <div>
+                            <h1>{{ $header }}</h1>
+                        </div>
+                        @if(isset($actions))
+                            <div>
+                                {{ $actions }}
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 {{ $slot }}
             </div>
         </div>
