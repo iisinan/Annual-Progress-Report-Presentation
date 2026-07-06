@@ -66,6 +66,34 @@ class StudentController extends Controller
         return redirect()->route('dashboard')->with('success', 'Presentation uploaded successfully.');
     }
 
+    public function updateAbstract(Request $request)
+    {
+        $request->validate([
+            'presentation_title' => 'required|string|max:1000',
+        ]);
+
+        $student = Auth::user()->student;
+        $presentation = $student->presentation;
+        
+        if (!$presentation) {
+            $presentation = new Presentation();
+            $presentation->student_id = $student->id;
+        }
+        
+        $presentation->presentation_title = $request->presentation_title;
+        $presentation->save();
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Updated Abstract',
+            'model_type' => 'Presentation',
+            'model_id' => $presentation->id,
+            'ip_address' => $request->ip()
+        ]);
+
+        return back()->with('success', 'Abstract updated successfully.');
+    }
+
     public function downloadSlip()
     {
         $student = Auth::user()->student;

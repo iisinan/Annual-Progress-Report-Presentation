@@ -14,6 +14,8 @@ use App\Models\Presentation;
 use Illuminate\Support\Facades\DB;
 use App\Models\Department;
 use App\Models\Programme;
+use App\Notifications\MassEmailNotification;
+use Illuminate\Support\Facades\Notification;
 
 class AdminController extends Controller
 {
@@ -40,6 +42,26 @@ class AdminController extends Controller
     {
         $student->load(['user', 'programme', 'department', 'presentation', 'schedule', 'reviews.examiner']);
         return view('admin.students.show', compact('student'));
+    }
+
+    public function sendMassEmail(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        $students = User::role('Student')->get();
+
+        Notification::send($students, new MassEmailNotification($request->subject, $request->message));
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Mass Email Sent',
+            'description' => "Sent mass email to " . $students->count() . " students. Subject: " . $request->subject,
+        ]);
+
+        return back()->with('success', 'Email sent to all students successfully.');
     }
 
     public function destroyStudent(Student $student)

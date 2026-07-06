@@ -125,7 +125,14 @@
             </div>
             <div class="row mb-3 py-2 border-bottom">
                 <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Abstract</div>
-                <div class="col-md-9">{{ $presentation->presentation_title ?? 'N/A' }}</div>
+                <div class="col-md-9">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>{{ $presentation->presentation_title ?? 'N/A' }}</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editAbstractModal" style="flex-shrink:0;">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="row mb-3 py-2 border-bottom">
                 <div class="col-md-3 text-muted fw-semibold" style="font-size:0.85rem;">Supervisor</div>
@@ -200,4 +207,33 @@
         </div>
     </div>
     @endif
+    </div>
+
+    <!-- Edit Abstract Modal -->
+    <div class="modal fade" id="editAbstractModal" tabindex="-1" aria-labelledby="editAbstractModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('student.abstract.update') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="editAbstractModalLabel"><i class="fa-solid fa-pen-to-square me-2"></i>Edit Abstract</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="presentation_title" class="form-label fw-bold">Abstract</label>
+                            <textarea class="form-control" id="presentation_title" name="presentation_title" rows="5" required>{{ $presentation->presentation_title ?? '' }}</textarea>
+                            <small class="text-muted">Update your abstract details here.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

@@ -3,6 +3,9 @@
         Registered Students
     </x-slot>
     <x-slot name="actions">
+        <button class="btn btn-info shadow-sm me-2 text-white" data-bs-toggle="modal" data-bs-target="#massEmailModal">
+            <i class="fa-solid fa-envelope me-2"></i> Send Mass Email
+        </button>
         <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
             <i class="fa-solid fa-user-plus me-2"></i> Add Student
         </button>
@@ -217,4 +220,35 @@
         });
     </script>
     @endpush
+    <!-- Mass Email Modal -->
+    <div class="modal fade" id="massEmailModal" tabindex="-1" aria-labelledby="massEmailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('admin.students.email.send') }}" method="POST">
+                    @csrf
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="massEmailModalLabel"><i class="fa-solid fa-envelope me-2"></i>Send Mass Email</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3">This email will be sent to all registered students.</p>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-info text-white">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Send Email
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

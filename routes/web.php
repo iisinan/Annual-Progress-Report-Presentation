@@ -32,12 +32,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
         Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
         Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
+        Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
     });
 
     // Admin Routes
     Route::middleware(['role:Administrator'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/students', [AdminController::class, 'students'])->name('students');
         Route::post('/students/store', [AdminController::class, 'storeStudent'])->name('students.store');
+        Route::get('/students/{student}', [AdminController::class, 'showStudent'])->name('students.show');
+        Route::post('/students/email', [AdminController::class, 'sendMassEmail'])->name('students.email.send');
         Route::delete('/students/{student}', [AdminController::class, 'destroyStudent'])->name('students.destroy');
         Route::get('/examiners', [AdminController::class, 'examiners'])->name('examiners');
         Route::post('/examiners/store', [AdminController::class, 'storeExaminer'])->name('examiners.store');
