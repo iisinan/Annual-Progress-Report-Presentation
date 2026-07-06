@@ -21,7 +21,7 @@ class AdminController extends Controller
 {
     public function students(Request $request)
     {
-        $currentSession = SystemSetting::where('key', 'current_session')->value('value') ?? '2025/2026';
+        $currentSession = SystemSetting::where('key', 'academic_session')->value('value') ?? '2025/2026';
         $session = $request->query('session', $currentSession);
 
         $query = Student::with(['user', 'programme', 'department', 'presentation', 'schedule']);

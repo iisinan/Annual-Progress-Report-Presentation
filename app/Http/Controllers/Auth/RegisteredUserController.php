@@ -88,7 +88,7 @@ class RegisteredUserController extends Controller
                 'supervisor_name' => $request->supervisor_name,
                 'research_title' => $request->research_title,
                 'current_research_stage' => $request->current_research_stage,
-                'academic_session' => SystemSetting::where('key', 'current_session')->value('value') ?? '2025/2026',
+                'academic_session' => SystemSetting::where('key', 'academic_session')->value('value') ?? '2025/2026',
             ]);
 
             Presentation::create([
