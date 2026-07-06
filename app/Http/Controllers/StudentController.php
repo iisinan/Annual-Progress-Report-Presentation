@@ -69,7 +69,7 @@ class StudentController extends Controller
     public function updateAbstract(Request $request)
     {
         $request->validate([
-            'presentation_title' => 'required|string|max:1000',
+            'presentation_title' => 'required|string|max:10000',
         ]);
 
         $student = Auth::user()->student;

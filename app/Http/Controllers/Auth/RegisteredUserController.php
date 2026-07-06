@@ -60,8 +60,8 @@ class RegisteredUserController extends Controller
             'year_of_admission' => ['required', 'integer', 'min:2010', 'max:' . date('Y')],
             'intake' => ['required', 'integer', 'in:1,2'],
             'supervisor_name' => ['required', 'string', 'max:255'],
-            'research_title' => ['required', 'string', 'max:500'],
-            'presentation_title' => ['required', 'string', 'max:500'],
+            'research_title' => ['required', 'string', 'max:10000'],
+            'presentation_title' => ['required', 'string', 'max:10000'],
             'current_research_stage' => ['required', 'string', 'max:255'],
             'confirm_info' => ['accepted'],
         ]);
