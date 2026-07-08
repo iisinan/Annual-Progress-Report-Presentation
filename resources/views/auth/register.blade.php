@@ -153,16 +153,26 @@
             <!-- Password -->
             <div class="col-md-6">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required autocomplete="new-password">
-                @error('password')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <div class="input-group">
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required autocomplete="new-password">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                    </button>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
 
             <!-- Confirm Password -->
             <div class="col-md-6">
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required autocomplete="new-password">
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required autocomplete="new-password">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                        <i class="fa-solid fa-eye" id="toggleConfirmPasswordIcon"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -186,4 +196,28 @@
             </button>
         </div>
     </form>
+
+    <script>
+        function toggleVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            toggleVisibility('password', 'togglePasswordIcon');
+        });
+        
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            toggleVisibility('password_confirmation', 'toggleConfirmPasswordIcon');
+        });
+    </script>
 </x-guest-layout>
