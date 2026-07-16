@@ -24,22 +24,8 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View|\Illuminate\Http\RedirectResponse
+    public function create(): View
     {
-        $isRegistrationActive = SystemSetting::where('key', 'is_registration_active')->value('value') ?? '1';
-        
-        if ($isRegistrationActive == '0') {
-            return redirect()->route('login')->with('error', 'Student Registration is currently deactivated by the administrator.');
-        } elseif ($isRegistrationActive == 'auto') {
-            $openDate = SystemSetting::where('key', 'registration_open_date')->value('value');
-            $closeDate = SystemSetting::where('key', 'registration_close_date')->value('value');
-            $now = now()->format('Y-m-d');
-            
-            if (($openDate && $now < $openDate) || ($closeDate && $now > $closeDate)) {
-                return redirect()->route('login')->with('error', 'Student Registration is currently closed.');
-            }
-        }
-
         $departments = Department::all();
         $programmes = Programme::all();
         
@@ -53,19 +39,6 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $isRegistrationActive = SystemSetting::where('key', 'is_registration_active')->value('value') ?? '1';
-        
-        if ($isRegistrationActive == '0') {
-            return redirect()->route('login')->with('error', 'Student Registration is currently deactivated by the administrator.');
-        } elseif ($isRegistrationActive == 'auto') {
-            $openDate = SystemSetting::where('key', 'registration_open_date')->value('value');
-            $closeDate = SystemSetting::where('key', 'registration_close_date')->value('value');
-            $now = now()->format('Y-m-d');
-            
-            if (($openDate && $now < $openDate) || ($closeDate && $now > $closeDate)) {
-                return redirect()->route('login')->with('error', 'Student Registration is currently closed.');
-            }
-        }
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -118,8 +91,12 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        // Notify Student
-        $user->notify(new StudentRegisteredNotification($student));
+        // Notify Student (wrapped so a DB/mail error never blocks registration)
+        try {
+            $user->notify(new StudentRegisteredNotification($student));
+        } catch (\Exception $e) {
+            // Notification failed silently — registration still succeeds
+        }
 
         Auth::login($user);
 
