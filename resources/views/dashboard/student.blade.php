@@ -12,6 +12,11 @@
                 <a href="{{ route('student.upload') }}" class="btn btn-sm fw-bold" style="background:#f8b400;color:#145e27;border-radius:8px;"><i class="fa-solid fa-upload me-1"></i> Upload PDF</a>
             @else
                 <a href="{{ route('student.slip') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:8px;"><i class="fa-solid fa-download me-1"></i> Download Slip</a>
+                <form action="{{ route('student.upload.delete') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your uploaded presentation? You will need to upload a new one before the deadline.');" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-danger fw-bold" style="border-radius:8px;"><i class="fa-solid fa-trash me-1"></i> Delete PDF</button>
+                </form>
             @endif
         </div>
     </div>

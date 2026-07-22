@@ -66,6 +66,36 @@ class StudentController extends Controller
         return redirect()->route('dashboard')->with('success', 'Presentation uploaded successfully.');
     }
 
+    public function deletePresentation()
+    {
+        $student = Auth::user()->student;
+        $presentation = $student->presentation;
+
+        if ($presentation && $presentation->file_path) {
+            // Delete from storage
+            Storage::disk('r2')->delete($presentation->file_path);
+            
+            // Update database
+            $presentation->file_path = null;
+            $presentation->original_filename = null;
+            $presentation->uploaded_at = null;
+            $presentation->status = 'pending';
+            $presentation->save();
+
+            AuditLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'Deleted Presentation File',
+                'model_type' => 'Presentation',
+                'model_id' => $presentation->id,
+                'ip_address' => request()->ip()
+            ]);
+
+            return redirect()->route('dashboard')->with('success', 'Presentation deleted successfully. You can now upload a new one.');
+        }
+
+        return redirect()->route('dashboard')->with('error', 'No presentation file found to delete.');
+    }
+
     public function updateAbstract(Request $request)
     {
         $request->validate([

@@ -31,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:Student'])->prefix('student')->name('student.')->group(function () {
         Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
         Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
+        Route::delete('/delete-presentation', [StudentController::class, 'deletePresentation'])->name('upload.delete')->middleware('check.upload');
         Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
         Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
     });
