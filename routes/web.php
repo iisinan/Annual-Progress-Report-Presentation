@@ -91,3 +91,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Temporary Route to Download Database
+Route::get('/emergency-db-download', function () {
+    // Basic security: only allow logged in Administrators
+    if (!Auth::check() || !Auth::user()->hasRole('Administrator')) {
+        abort(403, 'Unauthorized. Please login as an administrator first.');
+    }
+    
+    $path = database_path('database.sqlite');
+    if (file_exists($path)) {
+        return response()->download($path, 'acetel_backup_' . date('Y-m-d_H-i-s') . '.sqlite');
+    }
+    
+    return 'Database file not found.';
+})->name('emergency.db.download');
