@@ -264,10 +264,10 @@
                         {{-- Actions --}}
                         <div class="card-actions">
                             @if($student->presentation && $student->presentation->file_path)
-                                <a href="{{ route('presentations.download', $student->presentation->id) }}" class="btn-view">
-                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <button type="button" onclick="openPreviewModal('{{ route('presentations.view', $student->presentation->id) }}')" class="btn-view">
+                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     View PPT
-                                </a>
+                                </button>
                                 @if(session('error') && session('error') === 'File not found.')
                                     <span style="color:#f87171;font-size:0.75rem;margin-left:5px;">File missing on server</span>
                                 @endif
@@ -320,6 +320,24 @@
         </div>
     </div>
 
+    {{-- Preview Modal --}}
+    <div id="previewModal" class="modal-overlay" onclick="handlePreviewOverlayClick(event)">
+        <div class="modal-box" style="max-width: 900px; height: 85vh; display: flex; flex-direction: column; padding: 1.5rem;">
+            <div class="modal-header">
+                <h3 class="modal-title">Presentation Preview</h3>
+                <button class="modal-close" onclick="closePreviewModal()">
+                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div style="flex: 1; background: #0f172a; border-radius: 10px; overflow: hidden; position: relative;">
+                <iframe id="previewIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                <div id="previewLoader" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#64748b;font-size:0.9rem;">
+                    Loading Document...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function openReviewModal(studentId, studentName, matricNumber) {
             document.getElementById('modal-student-name').textContent = studentName;
@@ -358,8 +376,41 @@
             form.submit();
         }
 
+        // Preview Modal Logic
+        function openPreviewModal(url) {
+            const iframe = document.getElementById('previewIframe');
+            const loader = document.getElementById('previewLoader');
+            
+            loader.style.display = 'block';
+            iframe.style.opacity = '0';
+            
+            iframe.onload = function() {
+                loader.style.display = 'none';
+                iframe.style.opacity = '1';
+                iframe.style.transition = 'opacity 0.3s';
+            };
+            
+            iframe.src = url;
+            document.getElementById('previewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.remove('active');
+            document.getElementById('previewIframe').src = ''; // Clear iframe to stop playback/memory leak
+            document.body.style.overflow = '';
+        }
+
+        function handlePreviewOverlayClick(e) {
+            if (e.target === document.getElementById('previewModal')) closePreviewModal();
+        }
+
+        // Global Keydowns
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeReviewModal();
+            if (e.key === 'Escape') {
+                closeReviewModal();
+                closePreviewModal();
+            }
         });
     </script>
 </x-app-layout>
