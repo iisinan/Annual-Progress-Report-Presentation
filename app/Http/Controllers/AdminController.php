@@ -53,19 +53,42 @@ class AdminController extends Controller
 
         $students = User::role('Student')->get();
 
-        try {
-            Notification::send($students, new MassEmailNotification($request->subject, $request->message));
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to send emails. Error details: ' . $e->getMessage());
+        $successCount = 0;
+        $failCount = 0;
+        $lastError = '';
+
+        foreach ($students as $student) {
+            if (!filter_var($student->email, FILTER_VALIDATE_EMAIL)) {
+                $failCount++;
+                continue;
+            }
+
+            try {
+                $student->notify(new MassEmailNotification($request->subject, $request->message));
+                $successCount++;
+            } catch (\Exception $e) {
+                \Log::error("Failed to send mass email to {$student->email}: " . $e->getMessage());
+                $lastError = $e->getMessage();
+                $failCount++;
+            }
         }
 
         AuditLog::create([
             'user_id' => Auth::id(),
             'action' => 'Mass Email Sent',
-            'description' => "Sent mass email to " . $students->count() . " students. Subject: " . $request->subject,
+            'description' => "Mass email processing finished. Success: {$successCount}, Failed: {$failCount}. Subject: " . $request->subject,
         ]);
 
-        return back()->with('success', 'Email sent to all students successfully.');
+        if ($successCount === 0 && $failCount > 0) {
+            return back()->with('error', "Failed to send emails to all {$failCount} students. Last error: " . $lastError);
+        }
+
+        $msg = "Email sent to {$successCount} students successfully.";
+        if ($failCount > 0) {
+            $msg .= " Failed to send to {$failCount} students (invalid email format or server error).";
+        }
+
+        return back()->with('success', $msg);
     }
 
     public function destroyStudent(Student $student)
