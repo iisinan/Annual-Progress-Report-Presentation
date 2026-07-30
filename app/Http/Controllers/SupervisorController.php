@@ -65,4 +65,18 @@ class SupervisorController extends Controller
 
         return back()->with('success', 'Presentation rejected.');
     }
+
+    public function updateStatus(Request $request, Student $student)
+    {
+        $request->validate([
+            'status' => 'required|in:approved,rejected',
+            'comments' => 'nullable|string'
+        ]);
+
+        if ($request->input('status') === 'approved') {
+            return $this->approve($request, $student);
+        } else {
+            return $this->reject($request, $student);
+        }
+    }
 }

@@ -49,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\SupervisorController::class, 'dashboard'])->name('dashboard');
         Route::post('/approve/{student}', [\App\Http\Controllers\SupervisorController::class, 'approve'])->name('approve');
         Route::post('/reject/{student}', [\App\Http\Controllers\SupervisorController::class, 'reject'])->name('reject');
+        Route::post('/students/{student}/update-status', [\App\Http\Controllers\SupervisorController::class, 'updateStatus'])->name('students.update-status');
     });
 
     // Admin Routes
