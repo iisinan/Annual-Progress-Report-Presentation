@@ -15,6 +15,11 @@ class EnsureSupervisorsAssigned
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Prevent infinite redirect loop
+        if ($request->routeIs('student.supervisors.create') || $request->routeIs('student.supervisors.store') || $request->routeIs('logout')) {
+            return $next($request);
+        }
+
         $user = $request->user();
 
         if ($user && $user->hasRole('Student')) {

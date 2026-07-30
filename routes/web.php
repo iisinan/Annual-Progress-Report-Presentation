@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome', compact('settings'));
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsureSupervisorsAssigned::class])->group(function () {
     // Shared Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/notifications/read', [DashboardController::class, 'markNotificationsAsRead'])->name('notifications.read');
@@ -34,14 +34,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/supervisors/create', [\App\Http\Controllers\StudentSupervisorController::class, 'create'])->name('supervisors.create');
         Route::post('/supervisors', [\App\Http\Controllers\StudentSupervisorController::class, 'store'])->name('supervisors.store');
 
-        // Presentation routes require supervisors to be assigned
-        Route::middleware([\App\Http\Middleware\EnsureSupervisorsAssigned::class])->group(function () {
-            Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
-            Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
-            Route::delete('/delete-presentation', [StudentController::class, 'deletePresentation'])->name('upload.delete')->middleware('check.upload');
-            Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
-            Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
-        });
+        Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
+        Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
+        Route::delete('/delete-presentation', [StudentController::class, 'deletePresentation'])->name('upload.delete')->middleware('check.upload');
+        Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
+        Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
     });
 
     // Supervisor Routes
