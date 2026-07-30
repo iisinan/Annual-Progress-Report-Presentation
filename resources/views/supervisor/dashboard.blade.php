@@ -264,21 +264,12 @@
                         {{-- Actions --}}
                         <div class="card-actions">
                             @if($student->presentation && $student->presentation->file_path)
-                                @php
-                                    try {
-                                        // Use direct URL instead of signed temporary URLs (which R2 can sometimes block)
-                                        $pptUrl = Storage::disk('r2')->url($student->presentation->file_path);
-                                    } catch (\Exception $e) {
-                                        $pptUrl = null;
-                                    }
-                                @endphp
-                                @if($pptUrl)
-                                    <a href="{{ $pptUrl }}" target="_blank" class="btn-view">
-                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                        View PPT
-                                    </a>
-                                @else
-                                    <span style="color:#475569;font-size:0.78rem;">Link Error</span>
+                                <a href="{{ route('presentations.download', $student->presentation->id) }}" class="btn-view">
+                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    View PPT
+                                </a>
+                                @if(session('error') && session('error') === 'File not found.')
+                                    <span style="color:#f87171;font-size:0.75rem;margin-left:5px;">File missing on server</span>
                                 @endif
                             @else
                                 <span style="color:#475569;font-size:0.78rem;">No PPT</span>
