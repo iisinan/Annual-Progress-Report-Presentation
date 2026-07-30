@@ -38,6 +38,11 @@ class StudentSupervisorController extends Controller
         ]);
 
         foreach ($request->supervisors as $supData) {
+            // Check if this supervisor is already linked to this student BEFORE we create/attach
+            $alreadyLinked = $student->supervisors()
+                ->where('users.email', $supData['email'])
+                ->exists();
+
             $supervisorUser = User::firstOrCreate(
                 ['email' => $supData['email']],
                 [
@@ -46,8 +51,6 @@ class StudentSupervisorController extends Controller
                     'email_verified_at' => now(),
                 ]
             );
-
-            $isNewSupervisor = $supervisorUser->wasRecentlyCreated;
 
             // Ensure they have the Supervisor role
             if (!$supervisorUser->hasRole('Supervisor')) {
@@ -59,8 +62,9 @@ class StudentSupervisorController extends Controller
                 $supervisorUser->id => ['status' => 'pending']
             ]);
 
-            // Send welcome email — wrapped in try/catch so any SMTP failure never crashes the page
-            if ($isNewSupervisor) {
+            // Send the welcome/credentials email if this supervisor is newly assigned to this student
+            // This handles both: brand new accounts AND existing accounts being linked for the first time
+            if (!$alreadyLinked) {
                 try {
                     $supervisorUser->notify(
                         new \App\Notifications\SupervisorAccountCreated($student, 'password')
