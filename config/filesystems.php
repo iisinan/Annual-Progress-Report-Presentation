@@ -68,6 +68,8 @@ return [
             'bucket' => env('CLOUDFLARE_R2_BUCKET'),
             'endpoint' => env('CLOUDFLARE_R2_ENDPOINT'),
             'use_path_style_endpoint' => true,
+            'url' => env('CLOUDFLARE_R2_PUBLIC_URL'),
+            'visibility' => 'public',
             'throw' => false,
         ],
 
