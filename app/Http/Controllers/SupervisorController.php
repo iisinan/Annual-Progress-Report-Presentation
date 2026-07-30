@@ -12,7 +12,15 @@ class SupervisorController extends Controller
     {
         // Get all students assigned to this supervisor
         $students = Auth::user()->supervisees()->with('presentation')->get();
-        return view('supervisor.dashboard', compact('students'));
+        
+        $stats = [
+            'total' => $students->count(),
+            'pending' => $students->filter(fn($s) => $s->pivot->status === 'pending')->count(),
+            'approved' => $students->filter(fn($s) => $s->pivot->status === 'approved')->count(),
+            'scheduled' => $students->filter(fn($s) => $s->schedule !== null)->count(),
+        ];
+
+        return view('supervisor.dashboard', compact('students', 'stats'));
     }
 
     public function approve(Request $request, Student $student)
