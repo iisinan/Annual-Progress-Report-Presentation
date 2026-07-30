@@ -266,17 +266,10 @@
                             @if($student->presentation && $student->presentation->file_path)
                                 @php
                                     try {
-                                        // Try temporaryUrl first (signed), fall back to direct url
-                                        $pptUrl = Storage::disk('r2')->temporaryUrl(
-                                            $student->presentation->file_path,
-                                            now()->addHours(2)
-                                        );
+                                        // Use direct URL instead of signed temporary URLs (which R2 can sometimes block)
+                                        $pptUrl = Storage::disk('r2')->url($student->presentation->file_path);
                                     } catch (\Exception $e) {
-                                        try {
-                                            $pptUrl = Storage::disk('r2')->url($student->presentation->file_path);
-                                        } catch (\Exception $e2) {
-                                            $pptUrl = null;
-                                        }
+                                        $pptUrl = null;
                                     }
                                 @endphp
                                 @if($pptUrl)
