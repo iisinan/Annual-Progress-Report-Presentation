@@ -104,14 +104,6 @@
                 @enderror
             </div>
 
-            <!-- Supervisor Name -->
-            <div class="col-md-6">
-                <label for="supervisor_name" class="form-label">Supervisor Name</label>
-                <input type="text" class="form-control @error('supervisor_name') is-invalid @enderror" id="supervisor_name" name="supervisor_name" value="{{ old('supervisor_name') }}" required>
-                @error('supervisor_name')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
 
             <!-- Current Research Stage -->
             <div class="col-md-6">
