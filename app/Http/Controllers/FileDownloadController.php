@@ -12,9 +12,9 @@ class FileDownloadController extends Controller
 {
     public function downloadPresentation(Presentation $presentation, Request $request)
     {
-        // Check authorization: only Examiner or Admin can download, or the student themselves
+        // Check authorization: only Examiner, Admin, or Supervisor can download, or the student themselves
         $user = Auth::user();
-        if (!$user->hasRole('Administrator') && !$user->hasRole('Examiner') && (!isset($user->student) || $user->student->id !== $presentation->student_id)) {
+        if (!$user->hasRole(['Administrator', 'Examiner', 'Supervisor']) && (!isset($user->student) || $user->student->id !== $presentation->student_id)) {
             abort(403, 'Unauthorized access to this file.');
         }
 
@@ -49,7 +49,7 @@ class FileDownloadController extends Controller
     {
         // Check authorization
         $user = Auth::user();
-        if (!$user->hasRole('Administrator') && !$user->hasRole('Examiner') && (!isset($user->student) || $user->student->id !== $presentation->student_id)) {
+        if (!$user->hasRole(['Administrator', 'Examiner', 'Supervisor']) && (!isset($user->student) || $user->student->id !== $presentation->student_id)) {
             abort(403, 'Unauthorized access to this file.');
         }
 
