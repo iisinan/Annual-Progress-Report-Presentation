@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'Administrator']);
         $studentRole = Role::firstOrCreate(['name' => 'Student']);
         $examinerRole = Role::firstOrCreate(['name' => 'Examiner']);
+        $supervisorRole = Role::firstOrCreate(['name' => 'Supervisor']);
 
         // Create Admin User
         $admin = User::firstOrCreate(
@@ -57,18 +58,33 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create test student record
-        \App\Models\Student::firstOrCreate(
+        $testStudent = \App\Models\Student::firstOrCreate(
             ['matric_number' => 'NOU123456789'],
             [
                 'user_id' => $studentUser->id,
                 'phone_number' => '08012345678',
                 'department_id' => \App\Models\Department::where('name', 'Cybersecurity')->first()->id,
                 'programme_id' => \App\Models\Programme::where('name', 'MSc')->first()->id,
-                'supervisor_name' => 'Prof. Jane Smith',
+                'academic_session' => '2025/2026',
+                'year_of_admission' => '2024',
+                'intake' => 1,
                 'research_title' => 'An Analysis of Cybersecurity Threats in E-learning Platforms',
                 'current_research_stage' => 'Data Collection',
             ]
         );
+
+        // Create a test supervisor
+        $testSupervisor = User::firstOrCreate(
+            ['email' => 'supervisor@acetel.edu.ng'],
+            [
+                'name' => 'Prof. Jane Smith',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $testSupervisor->assignRole($supervisorRole);
+        $testStudent->supervisors()->syncWithoutDetaching([$testSupervisor->id => ['status' => 'approved']]);
+
         // Create 15 Dummy Students for testing (only in local environment where Faker is installed)
         if (app()->environment('local') && class_exists(\Faker\Factory::class)) {
             $departments = \App\Models\Department::all();
@@ -76,6 +92,21 @@ class DatabaseSeeder extends Seeder
             $faker = \Faker\Factory::create();
 
         if ($departments->count() > 0 && $programmes->count() > 0) {
+            // Pre-create some dummy supervisors
+            $dummySupervisors = [];
+            for ($s = 1; $s <= 5; $s++) {
+                $sup = User::firstOrCreate(
+                    ['email' => "supervisor{$s}@acetel.edu.ng"],
+                    [
+                        'name' => 'Dr. ' . $faker->lastName,
+                        'password' => Hash::make('password'),
+                        'email_verified_at' => now(),
+                    ]
+                );
+                $sup->assignRole($supervisorRole);
+                $dummySupervisors[] = $sup;
+            }
+
             for ($i = 1; $i <= 15; $i++) {
                 $dummyUser = User::firstOrCreate(
                     ['email' => "student{$i}@acetel.edu.ng"],
@@ -87,18 +118,32 @@ class DatabaseSeeder extends Seeder
                 );
                 $dummyUser->assignRole($studentRole);
 
-                \App\Models\Student::firstOrCreate(
+                $prog = $programmes->random();
+                $dummyStudent = \App\Models\Student::firstOrCreate(
                     ['matric_number' => 'NOU' . $faker->unique()->numerify('#########')],
                     [
                         'user_id' => $dummyUser->id,
                         'phone_number' => $faker->phoneNumber,
                         'department_id' => $departments->random()->id,
-                        'programme_id' => $programmes->random()->id,
-                        'supervisor_name' => 'Dr. ' . $faker->lastName,
+                        'programme_id' => $prog->id,
+                        'academic_session' => '2025/2026',
+                        'year_of_admission' => '2024',
+                        'intake' => $faker->randomElement([1, 2]),
                         'research_title' => $faker->sentence(6),
                         'current_research_stage' => $faker->randomElement(['Literature Review', 'Data Collection', 'Data Analysis', 'Writing']),
                     ]
                 );
+                
+                // Assign supervisors
+                $isPhd = str_contains(strtolower($prog->name), 'phd') || str_contains(strtolower($prog->name), 'doctor');
+                $supCount = $isPhd ? 3 : 2;
+                
+                $assignedSups = collect($dummySupervisors)->random($supCount);
+                foreach ($assignedSups as $sup) {
+                    $dummyStudent->supervisors()->syncWithoutDetaching([
+                        $sup->id => ['status' => $faker->randomElement(['pending', 'approved'])]
+                    ]);
+                }
             }
         }
         }

@@ -58,4 +58,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Announcement::class, 'created_by');
     }
+
+    public function supervisees()
+    {
+        return $this->belongsToMany(Student::class, 'student_supervisor', 'user_id', 'student_id')
+                    ->withPivot('status', 'comments')
+                    ->withTimestamps();
+    }
 }

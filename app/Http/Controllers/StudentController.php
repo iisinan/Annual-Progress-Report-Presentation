@@ -54,6 +54,11 @@ class StudentController extends Controller
         
         // Notify Student
         Auth::user()->notify(new PresentationUploadedNotification($presentation));
+
+        // Notify Supervisors
+        foreach ($student->supervisors as $supervisor) {
+            $supervisor->notify(new \App\Notifications\PresentationReadyForReview($student));
+        }
         
         AuditLog::create([
             'user_id' => Auth::id(),

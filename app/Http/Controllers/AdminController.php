@@ -24,7 +24,7 @@ class AdminController extends Controller
         $currentSession = SystemSetting::where('key', 'academic_session')->value('value') ?? '2025/2026';
         $session = $request->query('session', $currentSession);
 
-        $query = Student::with(['user', 'programme', 'department', 'presentation', 'schedule']);
+        $query = Student::with(['user', 'programme', 'department', 'presentation', 'schedule', 'supervisors']);
         
         if ($session !== 'all') {
             $query->where('academic_session', $session);
@@ -40,7 +40,7 @@ class AdminController extends Controller
 
     public function showStudent(Student $student)
     {
-        $student->load(['user', 'programme', 'department', 'presentation', 'schedule', 'reviews.examiner']);
+        $student->load(['user', 'programme', 'department', 'presentation', 'schedule', 'reviews.examiner', 'supervisors']);
         return view('admin.students.show', compact('student'));
     }
 
@@ -111,7 +111,6 @@ class AdminController extends Controller
             'academic_session' => ['required', 'string', 'max:255'],
             'year_of_admission' => ['required', 'integer', 'min:2010', 'max:' . date('Y')],
             'intake' => ['required', 'integer', 'in:1,2'],
-            'supervisor_name' => ['required', 'string', 'max:255'],
             'research_title' => ['required', 'string', 'max:500'],
             'presentation_title' => ['required', 'string', 'max:500'],
             'current_research_stage' => ['required', 'string', 'max:255'],
@@ -136,7 +135,6 @@ class AdminController extends Controller
                 'phone_number' => $request->phone_number,
                 'department_id' => $request->department_id,
                 'programme_id' => $request->programme_id,
-                'supervisor_name' => $request->supervisor_name,
                 'research_title' => $request->research_title,
                 'current_research_stage' => $request->current_research_stage,
             ]);

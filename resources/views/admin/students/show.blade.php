@@ -55,8 +55,27 @@
                         <div class="col-md-8">{{ $student->research_title }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 text-muted fw-bold">Supervisor</div>
-                        <div class="col-md-8">{{ $student->supervisor_name }}</div>
+                        <div class="col-md-4 text-muted fw-bold">Supervisors</div>
+                        <div class="col-md-8">
+                            @if($student->supervisors->count() > 0)
+                                <ul class="list-unstyled mb-0">
+                                @foreach($student->supervisors as $supervisor)
+                                    <li class="mb-1">
+                                        {{ $supervisor->name }} 
+                                        @if($supervisor->pivot->status == 'approved')
+                                            <span class="badge bg-success ms-1">Approved</span>
+                                        @elseif($supervisor->pivot->status == 'rejected')
+                                            <span class="badge bg-danger ms-1" title="{{ $supervisor->pivot->comments }}">Rejected</span>
+                                        @else
+                                            <span class="badge bg-warning ms-1 text-dark">Pending</span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                                </ul>
+                            @else
+                                <span class="text-muted italic">Not Assigned</span>
+                            @endif
+                        </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-4 text-muted fw-bold">Current Stage</div>

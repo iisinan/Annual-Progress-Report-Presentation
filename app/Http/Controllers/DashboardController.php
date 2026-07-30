@@ -66,6 +66,16 @@ class DashboardController extends Controller
 
         if ($user->hasRole('Student')) {
             $student = $user->student;
+            
+            // Check if supervisors are assigned
+            $progName = strtolower($student->programme->name);
+            $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
+            $requiredCount = $isPhd ? 3 : 2;
+
+            if ($student->supervisors()->count() < $requiredCount) {
+                return redirect()->route('student.supervisors.create')->with('warning', 'Please assign your supervisors before continuing.');
+            }
+            
             $presentation = $student->presentation;
             $schedule = $student->schedule;
             
@@ -110,6 +120,9 @@ class DashboardController extends Controller
             $announcements = Announcement::where('is_active', true)->latest()->take(3)->get();
             
             return view('dashboard.examiner', compact('stats', 'todays_schedule', 'announcements'));
+        }
+        if ($user->hasRole('Supervisor')) {
+            return redirect()->route('supervisor.dashboard');
         }
         
         abort(403);

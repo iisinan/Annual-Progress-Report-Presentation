@@ -21,10 +21,16 @@ class Student extends Model
         'year_of_admission',
         'intake',
         'phone_number',
-        'supervisor_name',
         'research_title',
         'current_research_stage',
     ];
+
+    public function supervisors()
+    {
+        return $this->belongsToMany(User::class, 'student_supervisor', 'student_id', 'user_id')
+                    ->withPivot('status', 'comments')
+                    ->withTimestamps();
+    }
 
     public function user(): BelongsTo
     {

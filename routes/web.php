@@ -29,11 +29,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Student Routes
     Route::middleware(['role:Student'])->prefix('student')->name('student.')->group(function () {
-        Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
-        Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
-        Route::delete('/delete-presentation', [StudentController::class, 'deletePresentation'])->name('upload.delete')->middleware('check.upload');
-        Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
-        Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
+        
+        // Supervisor Assignment Routes
+        Route::get('/supervisors/create', [\App\Http\Controllers\StudentSupervisorController::class, 'create'])->name('supervisors.create');
+        Route::post('/supervisors', [\App\Http\Controllers\StudentSupervisorController::class, 'store'])->name('supervisors.store');
+
+        // Presentation routes require supervisors to be assigned
+        Route::middleware([\App\Http\Middleware\EnsureSupervisorsAssigned::class])->group(function () {
+            Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
+            Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');
+            Route::delete('/delete-presentation', [StudentController::class, 'deletePresentation'])->name('upload.delete')->middleware('check.upload');
+            Route::get('/download-slip', [StudentController::class, 'downloadSlip'])->name('slip');
+            Route::post('/abstract/update', [StudentController::class, 'updateAbstract'])->name('abstract.update');
+        });
+    });
+
+    // Supervisor Routes
+    Route::middleware(['role:Supervisor'])->prefix('supervisor')->name('supervisor.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\SupervisorController::class, 'dashboard'])->name('dashboard');
+        Route::post('/approve/{student}', [\App\Http\Controllers\SupervisorController::class, 'approve'])->name('approve');
+        Route::post('/reject/{student}', [\App\Http\Controllers\SupervisorController::class, 'reject'])->name('reject');
     });
 
     // Admin Routes
