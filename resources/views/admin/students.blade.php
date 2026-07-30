@@ -8,8 +8,8 @@
     <style>
         .admin-dash {
             min-height: 100vh;
-            background-color: #0f172a; /* Slate 900 */
-            color: #f8fafc;
+            background-color: #f4f7f5; /* Light subtle gray */
+            color: #1f2937; /* Dark slate text */
             padding: 2rem;
             font-family: 'Inter', sans-serif;
             margin: -1.5rem;
@@ -28,34 +28,30 @@
             font-family: 'Outfit', sans-serif;
             font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #1a7a32; /* ACETEL Green */
         }
 
         .filter-form {
             display: flex;
             align-items: center;
-            background: rgba(30, 41, 59, 0.5);
+            background: #ffffff;
             padding: 0.5rem 1rem;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(26, 122, 50, 0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .filter-form select {
             background: transparent;
             border: none;
-            color: #f8fafc;
+            color: #1f2937;
             margin-left: 0.5rem;
             outline: none;
             cursor: pointer;
-        }
-        .filter-form select option {
-            background: #1e293b;
-            color: #f8fafc;
+            font-weight: 500;
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #1a7a32, #145e27);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -66,17 +62,18 @@
             gap: 0.5rem;
             transition: all 0.2s;
             text-decoration: none;
+            box-shadow: 0 4px 12px rgba(26, 122, 50, 0.2);
         }
         .btn-primary-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 6px 16px rgba(26, 122, 50, 0.3);
             color: white;
         }
 
         .btn-secondary-custom {
-            background: rgba(51, 65, 85, 0.8);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #ffffff;
+            color: #475569;
+            border: 1px solid #cbd5e1;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             font-weight: 600;
@@ -84,21 +81,20 @@
             align-items: center;
             gap: 0.5rem;
             transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .btn-secondary-custom:hover {
-            background: rgba(71, 85, 105, 1);
+            background: #f8fafc;
             transform: translateY(-2px);
-            color: white;
+            color: #1e293b;
         }
 
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #ffffff;
+            border: 1px solid rgba(26, 122, 50, 0.1);
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         /* Modern Table */
@@ -108,7 +104,7 @@
             border-spacing: 0 0.5rem;
         }
         .modern-table th {
-            color: #94a3b8;
+            color: #475569;
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.75rem;
@@ -118,24 +114,25 @@
             border: none;
         }
         .modern-table td {
-            background: rgba(15, 23, 42, 0.4);
+            background: #f8fafc;
             padding: 1rem;
             vertical-align: middle;
-            border-top: 1px solid rgba(255,255,255,0.02);
-            border-bottom: 1px solid rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(0,0,0,0.02);
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+            color: #334155;
         }
         .modern-table tr td:first-child {
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
-            border-left: 1px solid rgba(255,255,255,0.02);
+            border-left: 1px solid rgba(0,0,0,0.02);
         }
         .modern-table tr td:last-child {
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
-            border-right: 1px solid rgba(255,255,255,0.02);
+            border-right: 1px solid rgba(0,0,0,0.02);
         }
         .modern-table tr:hover td {
-            background: rgba(15, 23, 42, 0.8);
+            background: #f1f5f9;
         }
 
         /* Status Badges */
@@ -147,21 +144,9 @@
             font-weight: 600;
             letter-spacing: 0.025em;
         }
-        .status-approved {
-            background: rgba(16, 185, 129, 0.1);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-        .status-rejected {
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-        .status-pending {
-            background: rgba(245, 158, 11, 0.1);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
+        .status-approved { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .status-rejected { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #d97706; }
         
         /* General Badge */
         .general-badge {
@@ -169,17 +154,17 @@
             padding: 0.2rem 0.6rem;
             border-radius: 6px;
             font-size: 0.7rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-right: 0.25rem;
             margin-bottom: 0.25rem;
         }
-        .bg-blue { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .bg-gray { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+        .bg-blue { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+        .bg-gray { background: rgba(148, 163, 184, 0.1); color: #64748b; }
 
         .action-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #e2e8f0;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #475569;
             width: 32px;
             height: 32px;
             display: inline-flex;
@@ -191,52 +176,61 @@
             text-decoration: none;
         }
         .action-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: #f1f5f9;
+            color: #1e293b;
         }
         .action-btn.delete:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
             border-color: rgba(239, 68, 68, 0.3);
         }
 
-        /* DataTables overrides for dark mode */
+        /* DataTables overrides for light mode */
         .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
-            color: #cbd5e1 !important;
+            color: #475569 !important;
             font-size: 0.85rem;
             margin-bottom: 1rem;
         }
         .dataTables_wrapper .dataTables_filter input {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
             border-radius: 6px;
             padding: 0.3rem 0.75rem;
             margin-left: 0.5rem;
         }
         .dataTables_wrapper .dataTables_length select {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
             border-radius: 6px;
             padding: 0.3rem 1.5rem 0.3rem 0.75rem;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: #cbd5e1 !important;
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #475569 !important;
             border-radius: 6px;
             margin: 0 0.15rem;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: rgba(16, 185, 129, 0.2) !important;
-            border-color: rgba(16, 185, 129, 0.4) !important;
-            color: #34d399 !important;
+            background: rgba(26, 122, 50, 0.1) !important;
+            border-color: rgba(26, 122, 50, 0.3) !important;
+            color: #1a7a32 !important;
+            font-weight: bold;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            background: rgba(255,255,255,0.1) !important;
-            color: white !important;
+            background: #f1f5f9 !important;
+            color: #1e293b !important;
         }
+        
+        /* Modals */
+        .modal-content { background-color: #ffffff; color: #1f2937; border: none; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .modal-header { border-bottom: 1px solid rgba(0,0,0,0.05); background: #f8fafc; }
+        .modal-footer { border-top: 1px solid rgba(0,0,0,0.05); background: #f8fafc; }
+        .form-control, .form-select { background-color: #ffffff; color: #1f2937; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .form-control:focus, .form-select:focus { border-color: #1a7a32; box-shadow: 0 0 0 3px rgba(26, 122, 50, 0.1); }
+        .form-label { color: #475569; font-weight: 500; }
     </style>
 
     <div class="admin-dash">
@@ -245,7 +239,7 @@
             
             <div class="d-flex gap-3 align-items-center flex-wrap">
                 <form action="{{ route('admin.students') }}" method="GET" class="filter-form">
-                    <span class="text-sm text-slate-400">Session:</span>
+                    <span class="text-sm text-slate-500">Session:</span>
                     <select name="session" id="sessionFilter" onchange="this.form.submit()">
                         <option value="all" {{ $session === 'all' ? 'selected' : '' }}>All Sessions</option>
                         @foreach($sessions as $s)
@@ -287,13 +281,13 @@
                         @forelse($students as $student)
                         <tr>
                             <td>
-                                <div style="font-weight:600; color:#f8fafc;">{{ $student->user->name ?? 'Unknown (Deleted User)' }}</div>
-                                <div style="font-size:0.75rem; color:#94a3b8;">{{ $student->matric_number }}</div>
+                                <div style="font-weight:600; color:#111827;">{{ $student->user->name ?? 'Unknown (Deleted User)' }}</div>
+                                <div style="font-size:0.75rem; color:#6b7280;">{{ $student->matric_number }}</div>
                                 <div style="font-size:0.75rem; color:#64748b;">{{ $student->user->email ?? 'No email' }}</div>
                             </td>
                             <td>
-                                <div style="font-weight:500; color:#e2e8f0; font-size:0.85rem;">{{ $student->programme->name }}</div>
-                                <div style="font-size:0.75rem; color:#94a3b8;">{{ $student->department->name }}</div>
+                                <div style="font-weight:500; color:#334155; font-size:0.85rem;">{{ $student->programme->name }}</div>
+                                <div style="font-size:0.75rem; color:#6b7280;">{{ $student->department->name }}</div>
                             </td>
                             <td>
                                 @if($student->presentation && $student->presentation->file_path)
@@ -349,26 +343,14 @@
         </div>
     </div>
 
-    <!-- Keep Existing Modals but apply base classes to ensure they still render fine -->
-    <style>
-        /* Slightly adapt bootstrap modals for dark mode if they open here */
-        .modal-content { background-color: #1e293b; color: #f8fafc; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .modal-footer { border-top: 1px solid rgba(255,255,255,0.1); }
-        .form-control, .form-select { background-color: #0f172a; color: #f8fafc; border: 1px solid rgba(255,255,255,0.1); }
-        .form-control:focus, .form-select:focus { background-color: #0f172a; color: white; border-color: #34d399; box-shadow: none; }
-        .form-label { color: #cbd5e1; }
-        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
-    </style>
-
-    <!-- Add Student Modal (Kept structure exactly the same for backend logic) -->
-    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+    <!-- Add Student Modal -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('admin.students.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title font-semibold" id="addStudentModalLabel">Add New Student</h5>
+                        <h5 class="modal-title font-semibold text-dark" id="addStudentModalLabel">Add New Student</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -462,7 +444,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn-primary-custom" style="border:none;">Create Student</button>
                     </div>
                 </form>
@@ -471,17 +453,17 @@
     </div>
 
     <!-- Mass Email Modal -->
-    <div class="modal fade" id="massEmailModal" tabindex="-1" aria-labelledby="massEmailModalLabel" aria-hidden="true">
+    <div class="modal fade" id="massEmailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('admin.students.email.send') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title font-semibold" id="massEmailModalLabel">Send Mass Email</h5>
+                        <h5 class="modal-title font-semibold text-dark">Send Mass Email</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="text-sm mb-3" style="color:#94a3b8;">This email will be sent to all registered students.</p>
+                        <p class="text-sm mb-3" style="color:#64748b;">This email will be sent to all registered students.</p>
                         <div class="mb-3">
                             <label for="subject" class="form-label">Subject</label>
                             <input type="text" class="form-control" id="subject" name="subject" required>
@@ -492,7 +474,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn-primary-custom" style="border:none;">
                             Send Email
                         </button>

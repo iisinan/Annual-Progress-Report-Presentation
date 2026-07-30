@@ -101,24 +101,20 @@ class Student extends Model
 
     public function getSupervisorApprovalStatusAttribute()
     {
-        $progName = strtolower($this->programme->name ?? '');
-        $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
-        $requiredCount = $isPhd ? 3 : 2;
-
         $supervisors = $this->supervisors;
 
-        if ($supervisors->count() < $requiredCount) {
-            return 'pending'; // Not enough supervisors assigned yet
+        if ($supervisors->count() === 0) {
+            return 'pending'; // No supervisors assigned
         }
 
         $statuses = $supervisors->pluck('pivot.status');
+
+        if ($statuses->contains('approved')) {
+            return 'approved';
+        }
         
         if ($statuses->contains('rejected')) {
             return 'rejected';
-        }
-
-        if ($statuses->filter(fn($s) => $s === 'approved')->count() >= $requiredCount) {
-            return 'approved';
         }
 
         return 'pending';
