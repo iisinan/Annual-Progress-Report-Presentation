@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class StudentSupervisorController extends Controller
 {
@@ -38,36 +38,41 @@ class StudentSupervisorController extends Controller
         ]);
 
         foreach ($request->supervisors as $supData) {
-            $isNewSupervisor = false;
-            
             $supervisorUser = User::firstOrCreate(
                 ['email' => $supData['email']],
                 [
-                    'name' => $supData['name'],
-                    'password' => Hash::make('password'), // Default password
+                    'name'              => $supData['name'],
+                    'password'          => Hash::make('password'),
                     'email_verified_at' => now(),
                 ]
             );
 
-            if ($supervisorUser->wasRecentlyCreated) {
-                $isNewSupervisor = true;
-            }
+            $isNewSupervisor = $supervisorUser->wasRecentlyCreated;
 
             // Ensure they have the Supervisor role
             if (!$supervisorUser->hasRole('Supervisor')) {
                 $supervisorUser->assignRole('Supervisor');
             }
 
-            // Attach to student if not already attached
+            // Attach supervisor to student (pending status)
             $student->supervisors()->syncWithoutDetaching([
                 $supervisorUser->id => ['status' => 'pending']
             ]);
 
+            // Send welcome email — wrapped in try/catch so any SMTP failure never crashes the page
             if ($isNewSupervisor) {
-                $supervisorUser->notify(new \App\Notifications\SupervisorAccountCreated($student, 'password'));
+                try {
+                    $supervisorUser->notify(
+                        new \App\Notifications\SupervisorAccountCreated($student, 'password')
+                    );
+                    Log::info('Supervisor welcome email sent to: ' . $supervisorUser->email);
+                } catch (\Exception $e) {
+                    Log::error('Supervisor welcome email FAILED for: ' . $supervisorUser->email . ' — ' . $e->getMessage());
+                }
             }
         }
 
-        return redirect()->route('dashboard')->with('success', 'Supervisors assigned successfully.');
+        return redirect()->route('dashboard')
+            ->with('success', 'Supervisors assigned successfully! They will receive an email invitation shortly.');
     }
 }
