@@ -28,7 +28,15 @@ class ScheduleController extends Controller
         $breakDuration = (int) $request->input('break_duration', SystemSetting::where('key', 'break_duration')->value('value') ?? 0);
         $venue = $request->input('venue', SystemSetting::where('key', 'venue')->value('value') ?? 'Main Hall');
 
-        $students = Student::whereDoesntHave('schedule')->get();
+        $students = Student::with('supervisors', 'programme', 'presentation')
+            ->whereDoesntHave('schedule')
+            ->whereHas('presentation', function($q) {
+                $q->whereNotNull('file_path');
+            })
+            ->get()
+            ->filter(function($student) {
+                return $student->supervisor_approval_status === 'approved';
+            });
 
         if ($students->isEmpty()) {
             return redirect()->back()->with('error', 'All registered students already have a schedule.');
