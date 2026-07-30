@@ -53,7 +53,11 @@ class AdminController extends Controller
 
         $students = User::role('Student')->get();
 
-        Notification::send($students, new MassEmailNotification($request->subject, $request->message));
+        try {
+            Notification::send($students, new MassEmailNotification($request->subject, $request->message));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send emails. Your email provider (Gmail) might have exceeded its daily sending limit. Error details: ' . $e->getMessage());
+        }
 
         AuditLog::create([
             'user_id' => Auth::id(),
