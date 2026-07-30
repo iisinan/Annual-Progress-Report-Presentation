@@ -1,92 +1,303 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __('Assign Your Supervisors') }}
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Assign Supervisors') }}
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-gray-50 min-h-screen">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            
-            <!-- Instructions Banner -->
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg shadow-sm">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800">Important Instructions</h3>
-                        <div class="mt-2 text-sm text-blue-700">
-                            <p>
-                                Based on your programme, you are required to assign exactly <strong>{{ $requiredCount }} supervisors</strong>. 
-                                Please provide their correct full names and institutional email addresses. 
-                                The system will automatically create accounts for them and send them an email invitation to review your presentation.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+    <style>
+        .supervisors-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            padding: 3rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .supervisors-page::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .supervisors-page::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .page-container {
+            max-width: 760px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.025em;
+            margin: 0 0 0.5rem;
+        }
+        .page-subtitle {
+            color: #94a3b8;
+            font-size: 1rem;
+            margin: 0;
+        }
+        .info-banner {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        .info-banner svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            color: #60a5fa;
+            width: 20px;
+            height: 20px;
+        }
+        .info-banner p {
+            color: #bfdbfe;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .info-banner strong { color: #fff; }
+        .supervisor-card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 1.75rem 2rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .supervisor-card:hover {
+            border-color: rgba(99,102,241,0.4);
+            box-shadow: 0 0 30px rgba(99,102,241,0.1);
+        }
+        .supervisor-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 14px rgba(99,102,241,0.5);
+        }
+        .field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        @media (max-width: 600px) {
+            .field-grid { grid-template-columns: 1fr; }
+            .page-title { font-size: 1.6rem; }
+            .supervisor-card { padding: 1.25rem; }
+        }
+        .field-label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+        .styled-input {
+            width: 100%;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 0.95rem;
+            padding: 0.72rem 0.85rem 0.72rem 2.6rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .styled-input::placeholder { color: #475569; }
+        .styled-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+        }
+        .styled-input.is-invalid { border-color: #f87171; }
+        .field-error {
+            color: #fca5a5;
+            font-size: 0.78rem;
+            margin-top: 0.35rem;
+        }
+        .submit-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 24px rgba(99,102,241,0.45);
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99,102,241,0.6);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+            opacity: 0.9;
+        }
+        .submit-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+
+    <div class="supervisors-page">
+        <div class="page-container">
+
+            {{-- Page Header --}}
+            <div class="page-header">
+                <h1 class="page-title">Assign Your Supervisors</h1>
+                <p class="page-subtitle">Add the details of your designated academic supervisors for this report cycle.</p>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-md sm:rounded-xl border border-gray-100">
-                <div class="p-8">
-                    <form method="POST" action="{{ route('student.supervisors.store') }}" id="supervisor-form">
-                        @csrf
+            {{-- Info Banner --}}
+            <div class="info-banner">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p>
+                    Based on your programme, you are required to assign exactly <strong>{{ $requiredCount }} supervisors</strong>.
+                    Please provide their correct full names and institutional email addresses.
+                    The system will automatically create accounts for them and send an email invitation to review your presentation.
+                </p>
+            </div>
 
-                        <div class="space-y-8">
-                            @for ($i = 0; $i < $requiredCount; $i++)
-                                <div class="relative bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    
-                                    <!-- Badge -->
-                                    <div class="absolute -top-3 left-4 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                                        Supervisor {{ $i + 1 }}
-                                    </div>
+            {{-- Validation Errors --}}
+            @if ($errors->any())
+                <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.4);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+                    <p style="color:#fca5a5;font-weight:600;margin:0 0 0.5rem;">Please fix the following errors:</p>
+                    <ul style="color:#fca5a5;font-size:0.85rem;margin:0;padding-left:1.25rem;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                                        <!-- Name Field -->
-                                        <div>
-                                            <x-input-label for="supervisors_{{ $i }}_name" :value="__('Full Name with Title')" class="text-gray-700 font-medium" />
-                                            <div class="relative mt-1">
-                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                    </svg>
-                                                </div>
-                                                <input id="supervisors_{{ $i }}_name" type="text" name="supervisors[{{ $i }}][name]" value="{{ old('supervisors.'.$i.'.name') }}" class="pl-10 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm transition duration-150 ease-in-out" placeholder="e.g. Dr. John Doe" required autofocus="{{ $i === 0 ? 'true' : 'false' }}">
-                                            </div>
-                                            <x-input-error :messages="$errors->get('supervisors.'.$i.'.name')" class="mt-2" />
-                                        </div>
+            {{-- Form --}}
+            <form method="POST" action="{{ route('student.supervisors.store') }}">
+                @csrf
 
-                                        <!-- Email Field -->
-                                        <div>
-                                            <x-input-label for="supervisors_{{ $i }}_email" :value="__('Email Address')" class="text-gray-700 font-medium" />
-                                            <div class="relative mt-1">
-                                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                    </svg>
-                                                </div>
-                                                <input id="supervisors_{{ $i }}_email" type="email" name="supervisors[{{ $i }}][email]" value="{{ old('supervisors.'.$i.'.email') }}" class="pl-10 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm transition duration-150 ease-in-out" placeholder="e.g. supervisor@noun.edu.ng" required>
-                                            </div>
-                                            <x-input-error :messages="$errors->get('supervisors.'.$i.'.email')" class="mt-2" />
-                                        </div>
-                                    </div>
+                @for ($i = 0; $i < $requiredCount; $i++)
+                    <div class="supervisor-card">
+                        <div class="supervisor-badge">Supervisor {{ $i + 1 }}</div>
+
+                        <div class="field-grid">
+                            {{-- Name --}}
+                            <div>
+                                <label class="field-label" for="sup_name_{{ $i }}">Full Name with Title</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                    </span>
+                                    <input
+                                        id="sup_name_{{ $i }}"
+                                        type="text"
+                                        name="supervisors[{{ $i }}][name]"
+                                        value="{{ old('supervisors.'.$i.'.name') }}"
+                                        placeholder="e.g. Dr. Amina Bello"
+                                        class="styled-input @error('supervisors.'.$i.'.name') is-invalid @enderror"
+                                        required
+                                        @if($i === 0) autofocus @endif
+                                    >
                                 </div>
-                            @endfor
-                        </div>
+                                @error('supervisors.'.$i.'.name')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div class="flex items-center justify-end mt-8 border-t border-gray-100 pt-6">
-                            <button type="submit" class="inline-flex items-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg transform hover:-translate-y-0.5">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                {{ __('Confirm & Assign Supervisors') }}
-                            </button>
+                            {{-- Email --}}
+                            <div>
+                                <label class="field-label" for="sup_email_{{ $i }}">Email Address</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </span>
+                                    <input
+                                        id="sup_email_{{ $i }}"
+                                        type="email"
+                                        name="supervisors[{{ $i }}][email]"
+                                        value="{{ old('supervisors.'.$i.'.email') }}"
+                                        placeholder="e.g. supervisor@noun.edu.ng"
+                                        class="styled-input @error('supervisors.'.$i.'.email') is-invalid @enderror"
+                                        required
+                                    >
+                                </div>
+                                @error('supervisors.'.$i.'.email')
+                                    <p class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
-                    </form>
-                </div>
-            </div>
+                    </div>
+                @endfor
+
+                {{-- Submit Button --}}
+                <button type="submit" class="submit-btn">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Confirm &amp; Assign Supervisors
+                </button>
+            </form>
+
         </div>
     </div>
 </x-app-layout>
