@@ -95,9 +95,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/admin/schedule/{schedule}', [ScheduleController::class, 'update'])->name('admin.schedule.update');
         Route::get('/admin/reports/schedule/pdf', [ReportController::class, 'exportSchedulePdf'])->name('admin.reports.schedule.pdf');
     });
-    Route::middleware(['role:Examiner|Administrator'])->group(function () {
+    Route::middleware(['role:Examiner|Administrator|Supervisor'])->group(function () {
         Route::get('/presentations/{presentation}/download', [FileDownloadController::class, 'downloadPresentation'])->name('presentations.download');
-    Route::get('/presentations/{presentation}/view', [FileDownloadController::class, 'viewPresentation'])->name('presentations.view');
+        Route::get('/presentations/{presentation}/view', [FileDownloadController::class, 'viewPresentation'])->name('presentations.view');
     });
     Route::middleware(['role:Examiner'])->prefix('examiner')->name('examiner.')->group(function () {
         Route::get('/students', [AdminController::class, 'students'])->name('students'); // Shared view or separate
