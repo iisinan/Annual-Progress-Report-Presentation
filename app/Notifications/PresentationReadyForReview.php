@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Student;
 
-class PresentationReadyForReview extends Notification
+class PresentationReadyForReview extends Notification implements ShouldQueue
 {
     use Queueable;
 
