@@ -27,10 +27,11 @@ class StudentController extends Controller
 
         $student = Auth::user()->student;
         $presentation = $student->presentation;
+        $isResubmission = false;
 
-        // Ensure student can only upload once
         if ($presentation && $presentation->file_path) {
-            return redirect()->route('dashboard')->with('error', 'You have already uploaded your presentation and cannot upload it again.');
+            Storage::disk('r2')->delete($presentation->file_path);
+            $isResubmission = true;
         }
 
         $file = $request->file('presentation_file');
@@ -41,7 +42,6 @@ class StudentController extends Controller
         // Secure storage using Cloudflare R2
         $path = $file->storeAs('presentations', $fileName, 'r2');
         
-        $presentation = $student->presentation;
         if (!$presentation) {
             $presentation = new Presentation(['student_id' => $student->id]);
         }
@@ -51,6 +51,14 @@ class StudentController extends Controller
         $presentation->uploaded_at = now();
         $presentation->status = 'uploaded';
         $presentation->save();
+        
+        if ($isResubmission) {
+            foreach ($student->supervisors as $supervisor) {
+                $student->supervisors()->updateExistingPivot($supervisor->id, [
+                    'status' => 'pending'
+                ]);
+            }
+        }
         
         // Notify Student
         Auth::user()->notify(new PresentationUploadedNotification($presentation));
@@ -87,9 +95,16 @@ class StudentController extends Controller
             $presentation->status = 'pending';
             $presentation->save();
 
+            // Reset supervisor approvals since the file is being resubmitted
+            foreach ($student->supervisors as $supervisor) {
+                $student->supervisors()->updateExistingPivot($supervisor->id, [
+                    'status' => 'pending'
+                ]);
+            }
+
             AuditLog::create([
                 'user_id' => Auth::id(),
-                'action' => 'Deleted Presentation File',
+                'action' => 'Deleted Presentation File for Resubmission',
                 'model_type' => 'Presentation',
                 'model_id' => $presentation->id,
                 'ip_address' => request()->ip()

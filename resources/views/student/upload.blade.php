@@ -17,21 +17,20 @@
                 <div class="card-body">
                     
                     @if($presentation && $presentation->file_path)
-                        <div class="text-center py-4">
+                        <div class="text-center py-4 border-bottom mb-4">
                             <div class="mb-3" style="width:72px;height:72px;background:var(--acetel-green-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
-                                <i class="fa-solid fa-circle-check fa-2x" style="color:var(--acetel-green);"></i>
+                                <i class="fa-solid fa-file-pdf fa-2x" style="color:var(--acetel-green);"></i>
                             </div>
-                            <h5 class="fw-bold" style="color:var(--acetel-green);">Upload Complete!</h5>
-                            <p class="text-muted mb-1">Your presentation has been successfully uploaded:</p>
+                            <h5 class="fw-bold" style="color:var(--acetel-green);">Current Presentation</h5>
+                            <p class="text-muted mb-1">Your currently uploaded presentation is:</p>
                             <p class="fw-bold mb-1">{{ $presentation->original_filename }}</p>
                             <small class="text-muted">Uploaded on {{ $presentation->uploaded_at->format('d M Y, h:i A') }}</small>
+                            <div class="alert alert-warning mt-3 text-start mb-0" style="font-size:0.88rem;">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                                <strong>Resubmission Notice:</strong> You may upload a new PDF below to replace this file. Doing so will reset your supervisor approvals, and they will need to review your work again.
+                            </div>
                         </div>
-                        <div class="text-center pb-4">
-                            <a href="{{ route('dashboard') }}" class="btn btn-acetel px-4">
-                                <i class="fa-solid fa-gauge me-2"></i>Return to Dashboard
-                            </a>
-                        </div>
-                    @else
+                    @endif
                         <form id="uploadForm" method="POST" action="{{ route('student.upload.store') }}" enctype="multipart/form-data">
                             @csrf
 
@@ -41,7 +40,7 @@
                                 <div style="font-size:0.88rem;">
                                     <strong style="color:var(--acetel-green);">PDF format required.</strong>
                                     Please export your PowerPoint slides as a PDF before uploading.
-                                    Maximum file size: <strong>100MB</strong>. You can only upload <strong>once</strong>.
+                                    Maximum file size: <strong>100MB</strong>.
                                 </div>
                             </div>
 
@@ -70,7 +69,6 @@
                                 <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload PDF Presentation
                             </button>
                         </form>
-                    @endif
                 </div>
             </div>
         </div>
