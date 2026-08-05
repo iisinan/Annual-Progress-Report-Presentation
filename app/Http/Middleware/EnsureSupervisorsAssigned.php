@@ -26,12 +26,8 @@ class EnsureSupervisorsAssigned
             $student = $user->student;
             
             if ($student && $student->programme) {
-                $progName = strtolower($student->programme->name);
-                $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
-                $requiredCount = $isPhd ? 3 : 2;
-
-                if ($student->supervisors()->count() < $requiredCount) {
-                    return redirect()->route('student.supervisors.create')->with('warning', 'Please assign your supervisors before continuing.');
+                if ($student->supervisors()->count() < 1) {
+                    return redirect()->route('student.supervisors.create')->with('warning', 'Please assign your supervisor(s) before continuing.');
                 }
             }
         }

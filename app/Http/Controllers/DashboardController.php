@@ -68,12 +68,8 @@ class DashboardController extends Controller
             $student = $user->student;
             
             // Check if supervisors are assigned
-            $progName = strtolower($student->programme->name);
-            $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
-            $requiredCount = $isPhd ? 3 : 2;
-
-            if ($student->supervisors()->count() < $requiredCount) {
-                return redirect()->route('student.supervisors.create')->with('warning', 'Please assign your supervisors before continuing.');
+            if ($student->supervisors()->count() < 1) {
+                return redirect()->route('student.supervisors.create')->with('warning', 'Please assign your supervisor(s) before continuing.');
             }
             
             $presentation = $student->presentation;

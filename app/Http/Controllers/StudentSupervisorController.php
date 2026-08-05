@@ -13,26 +13,34 @@ class StudentSupervisorController extends Controller
     public function create()
     {
         $student = Auth::user()->student;
-        $progName = strtolower($student->programme->name);
+        $progName = strtolower($student->programme->name ?? '');
         $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
-        $requiredCount = $isPhd ? 3 : 2;
+        $maxCount = $isPhd ? 3 : 2;
 
-        if ($student->supervisors()->count() >= $requiredCount) {
-            return redirect()->route('dashboard')->with('info', 'You have already assigned your supervisors.');
+        if ($student->supervisors()->count() >= 1) {
+            return redirect()->route('dashboard')->with('info', 'You have already assigned your supervisor(s).');
         }
 
-        return view('student.supervisors.create', compact('requiredCount'));
+        return view('student.supervisors.create', compact('maxCount'));
     }
 
     public function store(Request $request)
     {
         $student = Auth::user()->student;
-        $progName = strtolower($student->programme->name);
+        $progName = strtolower($student->programme->name ?? '');
         $isPhd = str_contains($progName, 'phd') || str_contains($progName, 'doctor');
-        $requiredCount = $isPhd ? 3 : 2;
+        $maxCount = $isPhd ? 3 : 2;
+
+        // Filter out completely empty supervisor rows
+        $supervisors = array_filter($request->supervisors ?? [], function($sup) {
+            return !empty($sup['name']) || !empty($sup['email']);
+        });
+
+        // Merge back into request so validation works on the filtered array
+        $request->merge(['supervisors' => $supervisors]);
 
         $request->validate([
-            'supervisors' => ['required', 'array', "size:$requiredCount"],
+            'supervisors' => ['required', 'array', 'min:1', "max:$maxCount"],
             'supervisors.*.name' => 'required|string|max:255',
             'supervisors.*.email' => 'required|email|max:255',
         ]);

@@ -210,7 +210,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <p>
-                    Based on your programme, you are required to assign exactly <strong>{{ $requiredCount }} supervisors</strong>.
+                    Based on your programme, you may assign up to <strong>{{ $maxCount }} supervisors</strong>, but you must provide at least <strong>1</strong>.
                     Please provide their correct full names and institutional email addresses.
                     The system will automatically create accounts for them and send an email invitation to review your presentation.
                 </p>
@@ -232,9 +232,9 @@
             <form method="POST" action="{{ route('student.supervisors.store') }}">
                 @csrf
 
-                @for ($i = 0; $i < $requiredCount; $i++)
+                @for ($i = 0; $i < $maxCount; $i++)
                     <div class="supervisor-card">
-                        <div class="supervisor-badge">Supervisor {{ $i + 1 }}</div>
+                        <div class="supervisor-badge">Supervisor {{ $i + 1 }} @if($i > 0) (Optional) @endif</div>
 
                         <div class="field-grid">
                             {{-- Name --}}
@@ -253,8 +253,7 @@
                                         value="{{ old('supervisors.'.$i.'.name') }}"
                                         placeholder="e.g. Dr. Amina Bello"
                                         class="styled-input @error('supervisors.'.$i.'.name') is-invalid @enderror"
-                                        required
-                                        @if($i === 0) autofocus @endif
+                                        @if($i === 0) required autofocus @endif
                                     >
                                 </div>
                                 @error('supervisors.'.$i.'.name')
@@ -278,7 +277,7 @@
                                         value="{{ old('supervisors.'.$i.'.email') }}"
                                         placeholder="e.g. supervisor@noun.edu.ng"
                                         class="styled-input @error('supervisors.'.$i.'.email') is-invalid @enderror"
-                                        required
+                                        @if($i === 0) required @endif
                                     >
                                 </div>
                                 @error('supervisors.'.$i.'.email')
