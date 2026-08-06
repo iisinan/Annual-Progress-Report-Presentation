@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsureSupervisorsAss
         // Supervisor Assignment Routes
         Route::get('/supervisors/create', [\App\Http\Controllers\StudentSupervisorController::class, 'create'])->name('supervisors.create');
         Route::post('/supervisors', [\App\Http\Controllers\StudentSupervisorController::class, 'store'])->name('supervisors.store');
+        Route::get('/supervisors/search', [\App\Http\Controllers\StudentSupervisorController::class, 'search'])->name('supervisors.search');
 
         Route::get('/upload-presentation', [StudentController::class, 'showUploadForm'])->name('upload')->middleware('check.upload');
         Route::post('/upload-presentation', [StudentController::class, 'uploadPresentation'])->name('upload.store')->middleware('check.upload');

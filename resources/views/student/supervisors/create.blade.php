@@ -228,19 +228,22 @@
                 </div>
             @endif
 
+
             {{-- Form --}}
-            <form method="POST" action="{{ route('student.supervisors.store') }}">
+            <form method="POST" action="{{ route('student.supervisors.store') }}" id="supervisorForm">
                 @csrf
 
                 @for ($i = 0; $i < $maxCount; $i++)
-                    <div class="supervisor-card">
-                        <div class="supervisor-badge">Supervisor {{ $i + 1 }} @if($i > 0) (Optional) @endif</div>
+                    <div class="supervisor-card" id="card_{{ $i }}">
+                        <div class="supervisor-badge">
+                            Supervisor {{ $i + 1 }} @if($i > 0) <span style="opacity:0.7;font-weight:400;">(Optional)</span> @endif
+                        </div>
 
                         <div class="field-grid">
                             {{-- Name --}}
                             <div>
                                 <label class="field-label" for="sup_name_{{ $i }}">Full Name with Title</label>
-                                <div class="input-wrapper">
+                                <div class="input-wrapper" style="position:relative;">
                                     <span class="input-icon">
                                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -253,8 +256,11 @@
                                         value="{{ old('supervisors.'.$i.'.name') }}"
                                         placeholder="e.g. Dr. Amina Bello"
                                         class="styled-input @error('supervisors.'.$i.'.name') is-invalid @enderror"
+                                        autocomplete="off"
+                                        data-index="{{ $i }}"
                                         @if($i === 0) required autofocus @endif
                                     >
+                                    <div id="name_suggestions_{{ $i }}" class="autocomplete-dropdown" style="display:none;"></div>
                                 </div>
                                 @error('supervisors.'.$i.'.name')
                                     <p class="field-error">{{ $message }}</p>
@@ -264,8 +270,8 @@
                             {{-- Email --}}
                             <div>
                                 <label class="field-label" for="sup_email_{{ $i }}">Email Address</label>
-                                <div class="input-wrapper">
-                                    <span class="input-icon">
+                                <div class="input-wrapper" style="position:relative;">
+                                    <span class="input-icon" id="email_icon_{{ $i }}">
                                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
@@ -277,9 +283,13 @@
                                         value="{{ old('supervisors.'.$i.'.email') }}"
                                         placeholder="e.g. supervisor@noun.edu.ng"
                                         class="styled-input @error('supervisors.'.$i.'.email') is-invalid @enderror"
+                                        autocomplete="off"
+                                        data-index="{{ $i }}"
                                         @if($i === 0) required @endif
                                     >
                                 </div>
+                                {{-- Live status badge --}}
+                                <div id="account_status_{{ $i }}" style="margin-top:0.35rem; font-size:0.8rem; display:none;"></div>
                                 @error('supervisors.'.$i.'.email')
                                     <p class="field-error">{{ $message }}</p>
                                 @enderror
@@ -288,8 +298,14 @@
                     </div>
                 @endfor
 
+                {{-- Duplicate warning --}}
+                <div id="duplicateWarning" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.4); border-radius:10px; padding:0.85rem 1.1rem; margin-bottom:1rem; color:#fca5a5; font-size:0.88rem;">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    <strong>Duplicate Email:</strong> You have entered the same email address for more than one supervisor. Each supervisor must have a unique email.
+                </div>
+
                 {{-- Submit Button --}}
-                <button type="submit" class="submit-btn">
+                <button type="submit" class="submit-btn" id="submitBtn">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -299,4 +315,189 @@
 
         </div>
     </div>
+
+<style>
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1e293b;
+    border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 10px;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+    margin-top: 4px;
+}
+.autocomplete-item {
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: rgba(99,102,241,0.15); }
+.autocomplete-item .item-name { font-weight: 600; color: #e2e8f0; font-size:0.88rem; }
+.autocomplete-item .item-email { color: #94a3b8; font-size: 0.78rem; }
+.status-existing { color: #34d399; }
+.status-new { color: #94a3b8; }
+</style>
+
+<script>
+const SEARCH_URL = "{{ route('student.supervisors.search') }}";
+const maxCount = {{ $maxCount }};
+let searchTimers = {};
+let currentXhrs = {};
+
+function debounce(fn, delay, key) {
+    clearTimeout(searchTimers[key]);
+    searchTimers[key] = setTimeout(fn, delay);
+}
+
+function setAccountStatus(index, type, message) {
+    const el = document.getElementById('account_status_' + index);
+    el.style.display = 'block';
+    if (type === 'existing') {
+        el.innerHTML = '<i class="fa-solid fa-circle-check me-1" style="color:#34d399;"></i><span style="color:#34d399;">' + message + '</span>';
+    } else if (type === 'new') {
+        el.innerHTML = '<i class="fa-solid fa-circle-plus me-1" style="color:#94a3b8;"></i><span style="color:#94a3b8;">' + message + '</span>';
+    } else {
+        el.innerHTML = '';
+        el.style.display = 'none';
+    }
+}
+
+function closeSuggestions(index) {
+    const el = document.getElementById('name_suggestions_' + index);
+    if (el) el.style.display = 'none';
+}
+
+function fillFromSuggestion(index, name, email) {
+    document.getElementById('sup_name_' + index).value = name;
+    document.getElementById('sup_email_' + index).value = email;
+    closeSuggestions(index);
+    setAccountStatus(index, 'existing', 'Existing account found — will be reused automatically.');
+    checkDuplicates();
+}
+
+function searchSupervisors(query, index, targetField) {
+    const dropdown = document.getElementById('name_suggestions_' + index);
+    if (query.length < 2) {
+        dropdown.style.display = 'none';
+        return;
+    }
+
+    if (currentXhrs[index]) currentXhrs[index].abort();
+
+    const xhr = new XMLHttpRequest();
+    currentXhrs[index] = xhr;
+    xhr.open('GET', SEARCH_URL + '?q=' + encodeURIComponent(query), true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const results = JSON.parse(xhr.responseText);
+            if (results.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            dropdown.innerHTML = results.map(function (r) {
+                return '<div class="autocomplete-item" onclick="fillFromSuggestion(' + index + ', ' + JSON.stringify(r.name) + ', ' + JSON.stringify(r.email) + ')">' +
+                    '<div class="item-name">' + r.name + '</div>' +
+                    '<div class="item-email">' + r.email + '</div>' +
+                '</div>';
+            }).join('');
+            dropdown.style.display = 'block';
+        }
+    };
+    xhr.send();
+}
+
+function checkEmailExists(email, index) {
+    if (!email || email.length < 5 || !email.includes('@')) {
+        setAccountStatus(index, 'clear', '');
+        return;
+    }
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', SEARCH_URL + '?q=' + encodeURIComponent(email), true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            const results = JSON.parse(xhr.responseText);
+            const match = results.find(r => r.email.toLowerCase() === email.toLowerCase());
+            if (match) {
+                // Auto-fill name if empty
+                const nameInput = document.getElementById('sup_name_' + index);
+                if (!nameInput.value.trim()) {
+                    nameInput.value = match.name;
+                }
+                setAccountStatus(index, 'existing', 'Existing account found for ' + match.name + ' — will be reused automatically.');
+            } else {
+                setAccountStatus(index, 'new', 'New supervisor account will be created for this email.');
+            }
+        }
+    };
+    xhr.send();
+}
+
+function checkDuplicates() {
+    const emails = [];
+    let hasDuplicate = false;
+    for (let i = 0; i < maxCount; i++) {
+        const emailInput = document.getElementById('sup_email_' + i);
+        if (emailInput) {
+            const val = emailInput.value.trim().toLowerCase();
+            if (val) {
+                if (emails.includes(val)) { hasDuplicate = true; break; }
+                emails.push(val);
+            }
+        }
+    }
+    const warning = document.getElementById('duplicateWarning');
+    const submitBtn = document.getElementById('submitBtn');
+    warning.style.display = hasDuplicate ? 'block' : 'none';
+    submitBtn.disabled = hasDuplicate;
+}
+
+// Wire up all inputs
+document.addEventListener('DOMContentLoaded', function () {
+    for (let i = 0; i < maxCount; i++) {
+        const nameInput = document.getElementById('sup_name_' + i);
+        const emailInput = document.getElementById('sup_email_' + i);
+
+        if (nameInput) {
+            nameInput.addEventListener('input', function () {
+                debounce(function () {
+                    searchSupervisors(nameInput.value.trim(), i, 'name');
+                }, 300, 'name_' + i);
+            });
+            nameInput.addEventListener('blur', function () {
+                setTimeout(function () { closeSuggestions(i); }, 200);
+            });
+        }
+
+        if (emailInput) {
+            emailInput.addEventListener('input', function () {
+                checkDuplicates();
+                debounce(function () {
+                    checkEmailExists(emailInput.value.trim(), i);
+                }, 400, 'email_' + i);
+            });
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function (e) {
+        for (let i = 0; i < maxCount; i++) {
+            const dd = document.getElementById('name_suggestions_' + i);
+            const nameInput = document.getElementById('sup_name_' + i);
+            if (dd && nameInput && !dd.contains(e.target) && e.target !== nameInput) {
+                dd.style.display = 'none';
+            }
+        }
+    });
+});
+</script>
 </x-app-layout>
+
