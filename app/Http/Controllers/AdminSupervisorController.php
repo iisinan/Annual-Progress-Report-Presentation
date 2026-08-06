@@ -20,10 +20,10 @@ class AdminSupervisorController extends Controller
             ->orderByDesc('supervisees_count')
             ->get();
 
-        // Detect potential duplicates: supervisors sharing a similar name (case-insensitive)
+        // Detect potential duplicates: supervisors sharing the same email (case-insensitive)
         $potentialDuplicates = [];
         $grouped = $supervisors->groupBy(function ($s) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $s->name)));
+            return strtolower(trim($s->email));
         })->filter(fn($g) => $g->count() > 1);
 
         foreach ($grouped as $name => $group) {
@@ -155,6 +155,10 @@ class AdminSupervisorController extends Controller
                     ->update(['user_id' => $primary->id]);
             }
         }
+
+        // Transfer any comments and reviews made by the duplicate to the primary account
+        DB::table('comments')->where('user_id', $duplicate->id)->update(['user_id' => $primary->id]);
+        DB::table('reviews')->where('examiner_id', $duplicate->id)->update(['examiner_id' => $primary->id]);
 
         // Clean up any remaining pivot rows then delete the duplicate
         DB::table('student_supervisor')->where('user_id', $duplicate->id)->delete();

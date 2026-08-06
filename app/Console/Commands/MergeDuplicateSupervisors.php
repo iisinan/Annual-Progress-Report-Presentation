@@ -30,9 +30,9 @@ class MergeDuplicateSupervisors extends Command
             ->orderByDesc('supervisees_count')
             ->get();
 
-        // Group by normalised name (lowercase, collapsed whitespace)
+        // Group by normalised email (lowercase, trimmed)
         $groups = $supervisors->groupBy(function ($s) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $s->name)));
+            return strtolower(trim($s->email));
         })->filter(fn($g) => $g->count() > 1);
 
         if ($groups->isEmpty()) {
@@ -117,6 +117,10 @@ class MergeDuplicateSupervisors extends Command
                     ->update(['user_id' => $primary->id]);
             }
         }
+
+        // Transfer any comments and reviews made by the duplicate to the primary account
+        DB::table('comments')->where('user_id', $duplicate->id)->update(['user_id' => $primary->id]);
+        DB::table('reviews')->where('examiner_id', $duplicate->id)->update(['examiner_id' => $primary->id]);
 
         // Clean up remaining rows then hard-delete the duplicate
         DB::table('student_supervisor')->where('user_id', $duplicate->id)->delete();

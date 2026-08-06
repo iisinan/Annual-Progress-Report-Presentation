@@ -26,8 +26,8 @@
                 {{ count($potentialDuplicates) }} Group(s) of Duplicate Accounts Detected
             </h6>
             <p class="text-muted mb-4" style="font-size:0.85rem;">
-                These supervisors appear to have the same name but different email addresses.
-                Select which account to <strong>keep</strong> as the primary — all students from the others will be moved to it, and the duplicates will be permanently deleted.
+                These supervisors appear to have the same email address.
+                Select which account to <strong>keep</strong> as the primary — all students and data from the others will be moved to it, and the duplicates will be permanently deleted.
             </p>
 
             @foreach($potentialDuplicates as $groupIndex => $group)
