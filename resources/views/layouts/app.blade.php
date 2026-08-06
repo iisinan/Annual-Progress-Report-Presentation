@@ -331,6 +331,7 @@
                     <ul class="collapse list-unstyled {{ request()->is('admin/*') ? 'show' : '' }}" id="adminSubmenu">
                         <li><a href="{{ route('admin.students') }}"><i class="fa-solid fa-user-graduate"></i> Manage Students</a></li>
                         <li><a href="{{ route('admin.examiners') }}"><i class="fa-solid fa-chalkboard-user"></i> Manage Examiners</a></li>
+                        <li><a href="{{ route('admin.supervisors.index') }}"><i class="fa-solid fa-user-tie"></i> Manage Supervisors</a></li>
                         <li><a href="{{ route('admin.schedule.index') }}"><i class="fa-solid fa-calendar-days"></i> Presentation Schedule</a></li>
                         <li><a href="{{ route('admin.reports.index') }}"><i class="fa-solid fa-chart-bar"></i> Reports</a></li>
                         <li><a href="{{ route('admin.announcements.index') }}"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>

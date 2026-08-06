@@ -63,6 +63,11 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsureSupervisorsAss
         Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
         Route::post('/users/{user}/reset-password', [AdminController::class, 'resetUserPassword'])->name('users.reset-password');
         Route::get('/supervisors/export-csv', [AdminController::class, 'exportSupervisorsCSV'])->name('supervisors.export-csv');
+
+        // Supervisor Management
+        Route::get('/supervisors', [\App\Http\Controllers\AdminSupervisorController::class, 'index'])->name('supervisors.index');
+        Route::get('/supervisors/{supervisor}', [\App\Http\Controllers\AdminSupervisorController::class, 'show'])->name('supervisors.show');
+        Route::post('/supervisors/merge', [\App\Http\Controllers\AdminSupervisorController::class, 'merge'])->name('supervisors.merge');
         
         // Scheduling
         Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
