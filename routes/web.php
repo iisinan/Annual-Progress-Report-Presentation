@@ -61,6 +61,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsureSupervisorsAss
         Route::delete('/examiners/{examiner}', [AdminController::class, 'destroyExaminer'])->name('examiners.destroy');
         Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
         Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/users/{user}/reset-password', [AdminController::class, 'resetUserPassword'])->name('users.reset-password');
         
         // Scheduling
         Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');

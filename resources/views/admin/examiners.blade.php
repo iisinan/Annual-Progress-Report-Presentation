@@ -28,6 +28,10 @@
                             <td>{{ $examiner->email }}</td>
                             <td>{{ $examiner->created_at->format('d M Y') }}</td>
                             <td>
+                                <form action="{{ route('admin.users.reset-password', $examiner->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to reset the password for {{ $examiner->name }} to \'password\'?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset Password"><i class="fa-solid fa-key"></i></button>
+                                </form>
                                 <form action="{{ route('admin.examiners.destroy', $examiner->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this examiner?');">
                                     @csrf
                                     @method('DELETE')

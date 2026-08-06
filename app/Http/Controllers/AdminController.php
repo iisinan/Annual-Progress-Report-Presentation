@@ -276,4 +276,20 @@ class AdminController extends Controller
         $logs = AuditLog::with('user')->latest()->paginate(50);
         return view('admin.audit-logs', compact('logs'));
     }
+
+    public function resetUserPassword(\App\Models\User $user)
+    {
+        $user->password = \Illuminate\Support\Facades\Hash::make('password');
+        $user->save();
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Reset Password for User: ' . $user->email,
+            'model_type' => 'User',
+            'model_id' => $user->id,
+            'ip_address' => request()->ip()
+        ]);
+
+        return back()->with('success', "Password for {$user->name} has been reset to 'password'.");
+    }
 }

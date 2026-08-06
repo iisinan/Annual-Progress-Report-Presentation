@@ -321,6 +321,12 @@
                                         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>
                                     @if(auth()->user()->hasRole('Administrator'))
+                                    <form action="{{ route('admin.users.reset-password', $student->user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to reset the password for {{ $student->user->name }} to \'password\'?');" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="action-btn" style="color:#f59e0b; border-color:rgba(245,158,11,0.2); background:rgba(245,158,11,0.05);" title="Reset Password" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='rgba(245,158,11,0.05)'">
+                                            <i class="fa-solid fa-key"></i>
+                                        </button>
+                                    </form>
                                     <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student and all their records?');" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
