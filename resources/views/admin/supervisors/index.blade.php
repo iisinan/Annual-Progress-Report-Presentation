@@ -15,56 +15,113 @@
         <div class="alert alert-danger mb-4"><i class="fa-solid fa-circle-xmark me-2"></i>{{ session('error') }}</div>
     @endif
 
-    {{-- Potential Duplicates Alert --}}
+    {{-- ══════════════════════════════════════
+         POTENTIAL DUPLICATES PANEL
+    ══════════════════════════════════════ --}}
     @if(count($potentialDuplicates) > 0)
-    <div class="card mb-4 border-0" style="border-left: 4px solid #f59e0b !important; background:rgba(245,158,11,0.07);">
+    <div class="card mb-4 border-0" style="border-left: 4px solid #f59e0b !important; background:rgba(245,158,11,0.06);">
         <div class="card-body py-3 px-4">
-            <h6 class="fw-bold mb-3" style="color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation me-2"></i>Potential Duplicate Accounts Detected</h6>
-            <p class="text-muted mb-3" style="font-size:0.88rem;">The following supervisors appear to have the same name but different email addresses. Use the Merge tool below to consolidate them into a single account.</p>
+            <h6 class="fw-bold mb-1" style="color:#f59e0b;">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                {{ count($potentialDuplicates) }} Group(s) of Duplicate Accounts Detected
+            </h6>
+            <p class="text-muted mb-4" style="font-size:0.85rem;">
+                These supervisors appear to have the same name but different email addresses.
+                Select which account to <strong>keep</strong> as the primary — all students from the others will be moved to it, and the duplicates will be permanently deleted.
+            </p>
 
-            @foreach($potentialDuplicates as $group)
-            <div class="p-3 rounded mb-3" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3);">
-                <div class="fw-bold mb-2" style="color:#f59e0b; font-size:0.9rem;">
-                    <i class="fa-solid fa-user me-1"></i> {{ $group->first()->name }}
-                    <span class="badge ms-2" style="background:#f59e0b; color:#000;">{{ $group->count() }} accounts</span>
+            @foreach($potentialDuplicates as $groupIndex => $group)
+            <div class="p-4 rounded mb-3" style="background:rgba(0,0,0,0.15); border:1px solid rgba(245,158,11,0.25);">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-user-tag" style="color:#f59e0b;"></i>
+                    <span class="fw-bold" style="color:#f59e0b;">{{ $group->first()->name }}</span>
+                    <span class="badge ms-1" style="background:#f59e0b; color:#000;">{{ $group->count() }} accounts</span>
                 </div>
-                <div class="row g-2">
-                    @foreach($group as $sup)
-                    <div class="col-md-6">
-                        <div class="p-2 rounded d-flex justify-content-between align-items-center" style="background:rgba(0,0,0,0.15);">
-                            <div>
-                                <div class="fw-semibold" style="font-size:0.85rem;">{{ $sup->email }}</div>
-                                <small class="text-muted">{{ $sup->supervisees_count }} student(s)</small>
-                            </div>
-                            <span class="badge bg-secondary">ID: {{ $sup->id }}</span>
-                        </div>
-                    </div>
-                    @endforeach
+
+                {{-- Accounts table --}}
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm mb-0" style="font-size:0.85rem;">
+                        <thead style="background:rgba(255,255,255,0.04);">
+                            <tr>
+                                <th style="width:30px;">Primary</th>
+                                <th>Email</th>
+                                <th class="text-center">Students</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($group as $sup)
+                            <tr>
+                                <td class="text-center">
+                                    <input type="radio"
+                                           name="primary_group_{{ $groupIndex }}"
+                                           value="{{ $sup->id }}"
+                                           form="merge_form_{{ $groupIndex }}"
+                                           class="primary-radio"
+                                           data-group="{{ $groupIndex }}"
+                                           {{ $loop->first ? 'checked' : '' }}>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">{{ $sup->email }}</span>
+                                    @if($loop->first)
+                                        <span class="badge bg-success ms-1" id="primary_badge_{{ $groupIndex }}_{{ $sup->id }}">Primary ★</span>
+                                    @else
+                                        <span class="badge bg-secondary ms-1 d-none" id="primary_badge_{{ $groupIndex }}_{{ $sup->id }}">Primary ★</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge {{ $sup->supervisees_count > 0 ? 'bg-success' : 'bg-secondary' }}">
+                                        {{ $sup->supervisees_count }}
+                                    </span>
+                                </td>
+                                <td class="text-muted">{{ $sup->created_at->format('d M Y') }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                {{-- Quick merge form --}}
-                @if($group->count() === 2)
-                <form method="POST" action="{{ route('admin.supervisors.merge') }}" class="mt-3 merge-form" onsubmit="return false;">
+
+                {{-- Hidden merge form --}}
+                <form id="merge_form_{{ $groupIndex }}"
+                      method="POST"
+                      action="{{ route('admin.supervisors.merge-all') }}"
+                      class="merge-all-form">
                     @csrf
-                    <input type="hidden" name="primary_id" value="{{ $group->first()->id }}">
-                    <input type="hidden" name="duplicate_id" value="{{ $group->last()->id }}">
-                    <div class="d-flex gap-2 align-items-center flex-wrap">
-                        <small class="text-muted">Keep: <strong>{{ $group->first()->email }}</strong> and merge <strong>{{ $group->last()->email }}</strong> into it</small>
-                        <button type="submit" class="btn btn-sm btn-warning fw-bold" data-msg="Merge '{{ $group->last()->email }}' into '{{ $group->first()->email }}'? This cannot be undone.">
-                            <i class="fa-solid fa-code-merge me-1"></i> Merge Now
-                        </button>
-                    </div>
+                    {{-- primary_id will be set by JS based on selected radio --}}
+                    <input type="hidden" name="primary_id" id="primary_id_{{ $groupIndex }}" value="{{ $group->first()->id }}">
+                    {{-- All IDs in the group — JS will exclude the primary before submit --}}
+                    @foreach($group as $sup)
+                        <input type="hidden" name="all_ids[]" value="{{ $sup->id }}">
+                    @endforeach
                 </form>
-                @endif
+
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <small class="text-muted">
+                        <i class="fa-solid fa-info-circle me-1"></i>
+                        Select the radio button next to the account you want to <strong>keep</strong>, then click Merge All.
+                    </small>
+                    <button type="button"
+                            class="btn btn-warning btn-sm fw-bold merge-all-btn"
+                            data-group="{{ $groupIndex }}"
+                            data-count="{{ $group->count() - 1 }}">
+                        <i class="fa-solid fa-code-merge me-1"></i>
+                        Merge All {{ $group->count() - 1 }} Duplicate(s) Into Primary
+                    </button>
+                </div>
             </div>
             @endforeach
         </div>
     </div>
     @endif
 
-    {{-- All Supervisors Table --}}
+    {{-- ══════════════════════════════════════
+         ALL SUPERVISORS TABLE
+    ══════════════════════════════════════ --}}
     <div class="card border-0 shadow-sm">
         <div class="card-header py-3" style="background:var(--acetel-green-pale); border-bottom:2px solid var(--acetel-green);">
-            <h6 class="m-0 fw-bold" style="color:var(--acetel-green);"><i class="fa-solid fa-list me-2"></i>All Supervisor Accounts ({{ $supervisors->count() }})</h6>
+            <h6 class="m-0 fw-bold" style="color:var(--acetel-green);">
+                <i class="fa-solid fa-list me-2"></i>All Supervisor Accounts ({{ $supervisors->count() }})
+            </h6>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -91,12 +148,15 @@
                             <td class="text-muted" style="font-size:0.85rem;">{{ $sup->created_at->format('d M Y') }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.supervisors.show', $sup->id) }}" class="btn btn-sm btn-outline-primary" title="View Students">
+                                    <a href="{{ route('admin.supervisors.show', $sup->id) }}"
+                                       class="btn btn-sm btn-outline-primary" title="View Students">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
-                                    <form action="{{ route('admin.users.reset-password', $sup->id) }}" method="POST" class="reset-pw-form d-inline">
+                                    <form action="{{ route('admin.users.reset-password', $sup->id) }}"
+                                          method="POST" class="reset-pw-form d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-warning" data-name="{{ $sup->name }}" title="Reset Password">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning"
+                                                data-name="{{ $sup->name }}" title="Reset Password">
                                             <i class="fa-solid fa-key"></i>
                                         </button>
                                     </form>
@@ -104,7 +164,9 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" class="text-center text-muted py-4">No supervisor accounts found.</td></tr>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No supervisor accounts found.</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -112,38 +174,49 @@
         </div>
     </div>
 
-    {{-- Manual Merge Tool --}}
+    {{-- ══════════════════════════════════════
+         MANUAL MERGE TOOL (any two accounts)
+    ══════════════════════════════════════ --}}
     <div class="card border-0 shadow-sm mt-4">
         <div class="card-header py-3" style="background:rgba(239,68,68,0.06); border-bottom:2px solid #ef4444;">
-            <h6 class="m-0 fw-bold text-danger"><i class="fa-solid fa-code-merge me-2"></i>Manual Account Merge Tool</h6>
+            <h6 class="m-0 fw-bold text-danger">
+                <i class="fa-solid fa-code-merge me-2"></i>Manual Account Merge Tool
+            </h6>
         </div>
         <div class="card-body">
             <p class="text-muted mb-3" style="font-size:0.88rem;">
-                Select a <strong>Primary</strong> account (to keep) and a <strong>Duplicate</strong> account (to delete). All students from the duplicate will be reassigned to the primary account, and the duplicate will be permanently removed.
+                Select a <strong>Primary</strong> account (to keep) and one or more <strong>Duplicate</strong> accounts (to delete).
+                All students from the duplicates will be reassigned to the primary, and the duplicates will be permanently removed.
             </p>
-            <form method="POST" action="{{ route('admin.supervisors.merge') }}" class="merge-form" onsubmit="return false;">
+            <form method="POST" action="{{ route('admin.supervisors.merge-all') }}"
+                  id="manualMergeForm" class="merge-manual-form">
                 @csrf
                 <div class="row g-3 align-items-end">
                     <div class="col-md-5">
-                        <label class="form-label fw-semibold">Primary Account <span class="text-muted fw-normal">(keep this)</span></label>
+                        <label class="form-label fw-semibold">Primary Account <span class="text-muted fw-normal">(keep)</span></label>
                         <select name="primary_id" class="form-select" required>
-                            <option value="">-- Select supervisor --</option>
+                            <option value="">-- Select supervisor to keep --</option>
                             @foreach($supervisors as $sup)
-                            <option value="{{ $sup->id }}">{{ $sup->name }} &lt;{{ $sup->email }}&gt; ({{ $sup->supervisees_count }} students)</option>
+                            <option value="{{ $sup->id }}">
+                                {{ $sup->name }} &lt;{{ $sup->email }}&gt; ({{ $sup->supervisees_count }} students)
+                            </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label fw-semibold">Duplicate Account <span class="text-muted fw-normal">(delete this)</span></label>
-                        <select name="duplicate_id" class="form-select" required>
-                            <option value="">-- Select duplicate --</option>
+                        <label class="form-label fw-semibold">Duplicate Account(s) <span class="text-muted fw-normal">(delete — hold Ctrl/⌘ to pick multiple)</span></label>
+                        <select name="duplicate_ids[]" class="form-select" multiple required size="5" style="height:auto;">
                             @foreach($supervisors as $sup)
-                            <option value="{{ $sup->id }}">{{ $sup->name }} &lt;{{ $sup->email }}&gt; ({{ $sup->supervisees_count }} students)</option>
+                            <option value="{{ $sup->id }}">
+                                {{ $sup->name }} &lt;{{ $sup->email }}&gt; ({{ $sup->supervisees_count }} students)
+                            </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn btn-danger w-100" data-msg="Are you sure? This will permanently delete the duplicate account and move all its students to the primary. This cannot be undone.">
+                        <button type="button" id="manualMergeBtn"
+                                class="btn btn-danger w-100"
+                                data-msg="Merge selected duplicates into the primary? This is PERMANENT and cannot be undone.">
                             <i class="fa-solid fa-code-merge me-1"></i> Merge
                         </button>
                     </div>
@@ -154,28 +227,77 @@
 
     @push('scripts')
     <script>
-        // Safe confirm for all merge forms
-        document.querySelectorAll('.merge-form').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var btn = form.querySelector('[data-msg]');
-                var msg = btn ? btn.getAttribute('data-msg') : 'Are you sure you want to merge these accounts?';
-                if (confirm(msg)) {
-                    form.submit();
-                }
-            });
+    // ── Radio badge update (show which is primary in duplicate groups) ──
+    document.querySelectorAll('.primary-radio').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            const group = this.dataset.group;
+            // Hide all badges in this group
+            document.querySelectorAll('[id^="primary_badge_' + group + '_"]').forEach(b => b.classList.add('d-none'));
+            // Show the selected badge
+            const badge = document.getElementById('primary_badge_' + group + '_' + this.value);
+            if (badge) badge.classList.remove('d-none');
+            // Update hidden primary_id
+            document.getElementById('primary_id_' + group).value = this.value;
         });
+    });
 
-        // Safe confirm for reset password
-        document.querySelectorAll('.reset-pw-form').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                var name = form.querySelector('[data-name]').getAttribute('data-name');
-                if (confirm("Reset password for " + name + " to 'password'?")) {
-                    form.submit();
+    // ── Merge All button (auto-detect group) ──
+    document.querySelectorAll('.merge-all-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const group    = this.dataset.group;
+            const count    = this.dataset.count;
+            const primaryId = document.getElementById('primary_id_' + group).value;
+            const form     = document.getElementById('merge_form_' + group);
+
+            if (!confirm('Merge ' + count + ' duplicate account(s) into the selected primary? This is PERMANENT and cannot be undone.')) return;
+
+            // Build duplicate_ids[] from all_ids[] excluding the chosen primary
+            const allInputs = form.querySelectorAll('input[name="all_ids[]"]');
+            // Remove any old duplicate_ids inputs
+            form.querySelectorAll('input[name="duplicate_ids[]"]').forEach(el => el.remove());
+
+            allInputs.forEach(function (inp) {
+                if (inp.value !== primaryId) {
+                    const hidden = document.createElement('input');
+                    hidden.type  = 'hidden';
+                    hidden.name  = 'duplicate_ids[]';
+                    hidden.value = inp.value;
+                    form.appendChild(hidden);
                 }
             });
+
+            form.submit();
         });
+    });
+
+    // ── Manual merge tool ──
+    document.getElementById('manualMergeBtn').addEventListener('click', function () {
+        const form = document.getElementById('manualMergeForm');
+        const primaryId = form.querySelector('[name="primary_id"]').value;
+        const selected  = [...form.querySelectorAll('[name="duplicate_ids[]"] option:checked')];
+
+        if (!primaryId) { alert('Please select a Primary account.'); return; }
+        if (selected.length === 0) { alert('Please select at least one Duplicate account.'); return; }
+
+        // Prevent merging into itself
+        const selfSelected = selected.some(o => o.value === primaryId);
+        if (selfSelected) { alert('You cannot merge an account into itself. Please deselect the primary from the duplicates list.'); return; }
+
+        if (!confirm('Merge ' + selected.length + ' account(s) into the primary? This is PERMANENT and cannot be undone.')) return;
+
+        form.submit();
+    });
+
+    // ── Reset password confirm ──
+    document.querySelectorAll('.reset-pw-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var name = form.querySelector('[data-name]').getAttribute('data-name');
+            if (confirm("Reset password for " + name + " to 'password'?")) {
+                form.submit();
+            }
+        });
+    });
     </script>
     @endpush
 </x-app-layout>

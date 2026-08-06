@@ -69,6 +69,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\EnsureSupervisorsAss
         Route::get('/supervisors', [\App\Http\Controllers\AdminSupervisorController::class, 'index'])->name('supervisors.index');
         Route::get('/supervisors/{supervisor}', [\App\Http\Controllers\AdminSupervisorController::class, 'show'])->name('supervisors.show');
         Route::post('/supervisors/merge', [\App\Http\Controllers\AdminSupervisorController::class, 'merge'])->name('supervisors.merge');
+        Route::post('/supervisors/merge-all', [\App\Http\Controllers\AdminSupervisorController::class, 'mergeAll'])->name('supervisors.merge-all');
         
         // Scheduling
         Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
