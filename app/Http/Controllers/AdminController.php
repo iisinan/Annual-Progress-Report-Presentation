@@ -282,6 +282,12 @@ class AdminController extends Controller
         $user->password = \Illuminate\Support\Facades\Hash::make('password');
         $user->save();
 
+        try {
+            $user->notify(new \App\Notifications\PasswordResetByAdmin('password'));
+        } catch (\Exception $e) {
+            \Log::error("Failed to send password reset email to {$user->email}: " . $e->getMessage());
+        }
+
         AuditLog::create([
             'user_id' => Auth::id(),
             'action' => 'Reset Password for User: ' . $user->email,
@@ -290,6 +296,6 @@ class AdminController extends Controller
             'ip_address' => request()->ip()
         ]);
 
-        return back()->with('success', "Password for {$user->name} has been reset to 'password'.");
+        return back()->with('success', "Password for {$user->name} has been reset to 'password' and they have been notified.");
     }
 }
