@@ -35,6 +35,21 @@
             </div>
         </div>
 
+        <!-- Supervisors Export -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-5">
+                    <i class="fa-solid fa-chalkboard-user fa-3x text-warning mb-3"></i>
+                    <h5 class="fw-bold">Student Supervisors</h5>
+                    <p class="text-muted mb-4">Export a complete list of all supervisors assigned by students, including supervisor names and email addresses.</p>
+                    
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ route('admin.supervisors.export-csv') }}" class="btn btn-warning"><i class="fa-solid fa-file-csv me-2"></i> Export CSV</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Attendance Sheet Report (Placeholder for future) -->
         <div class="col-md-6">
             <div class="card border-0 shadow-sm h-100">

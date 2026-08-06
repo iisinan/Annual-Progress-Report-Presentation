@@ -298,4 +298,50 @@ class AdminController extends Controller
 
         return back()->with('success', "Password for {$user->name} has been reset to 'password' and they have been notified.");
     }
+
+    public function exportSupervisorsCSV()
+    {
+        $students = \App\Models\Student::with(['user', 'supervisors'])->get();
+
+        $filename = 'supervisors_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($students) {
+            $handle = fopen('php://output', 'w');
+
+            // Header row
+            fputcsv($handle, [
+                'Student Matric No.',
+                'Student Name',
+                'Supervisor Name',
+                'Supervisor Email',
+            ]);
+
+            foreach ($students as $student) {
+                foreach ($student->supervisors as $supervisor) {
+                    fputcsv($handle, [
+                        $student->matric_number,
+                        $student->user->name ?? 'N/A',
+                        $supervisor->name,
+                        $supervisor->email,
+                    ]);
+                }
+            }
+
+            fclose($handle);
+        };
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Exported Supervisors CSV',
+            'model_type' => 'User',
+            'ip_address' => request()->ip()
+        ]);
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
